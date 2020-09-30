@@ -1,4 +1,4 @@
-package com.achiever.menschenfahren.controller;
+package com.achiever.menschenfahren.controller.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.constants.Constants;
+import com.achiever.menschenfahren.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
 import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
@@ -26,7 +28,7 @@ import com.achiever.menschenfahren.service.UserService;
  *
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Constants.SERVICE_EVENT_API)
 public class UserRestController extends BaseController implements UserRestControllerInterface {
 
 	// private final UserMapper userMapper = new UserMapper();

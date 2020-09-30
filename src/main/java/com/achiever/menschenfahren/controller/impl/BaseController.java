@@ -1,4 +1,4 @@
-package com.achiever.menschenfahren.controller;
+package com.achiever.menschenfahren.controller.impl;
 
 import javax.annotation.Nonnull;
 

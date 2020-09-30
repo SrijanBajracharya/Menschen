@@ -1,4 +1,4 @@
-package com.achiever.menschenfahren.service;
+package com.achiever.menschenfahren.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.achiever.menschenfahren.dao.EventDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
+import com.achiever.menschenfahren.service.EventService;
 
 @Service
 public class EventServiceImpl implements EventService {

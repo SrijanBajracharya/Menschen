@@ -1,4 +1,4 @@
-package com.achiever.menschenfahren.service;
+package com.achiever.menschenfahren.service.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +13,7 @@ import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
+import com.achiever.menschenfahren.service.UserService;
 
 @Service
 public class UserServiceImpl implements UserService {

@@ -20,7 +20,7 @@ public interface UserService {
 	 * @param eventId The id of the event.
 	 * @return
 	 */
-	Optional<User> getUser(@Nonnull final String userId, final boolean alsoVoided);
+	Optional<User> findById(@Nonnull final String id, final boolean alsoVoided);
 
 	/**
 	 * Adds new User.

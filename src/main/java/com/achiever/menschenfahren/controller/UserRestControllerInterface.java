@@ -17,9 +17,9 @@ import com.achiever.menschenfahren.constants.CommonConstants;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
 import com.achiever.menschenfahren.entities.response.UserDto;
-import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
+import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
+import com.achiever.menschenfahren.entities.response.UserProfileDto;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 
@@ -92,7 +92,7 @@ public interface UserRestControllerInterface {
 			@ApiResponse(responseCode = "410", description = "The user has been voided"),
 			@ApiResponse(responseCode = "404", description = "No user found with the userId") })
 	@GetMapping("users/{userId}")
-	ResponseEntity<DataResponse<User>> getUser(
+	ResponseEntity<DataResponse<UserDto>> getUser(
 			@PathVariable(name = "userId", required = true) @Nonnull final String userId,
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidUserException;
@@ -110,12 +110,12 @@ public interface UserRestControllerInterface {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided users are also considered and returned.") })
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "UserProfile was successfully created", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserProfile.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserProfileCreateDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "Returned if the User Profile data contained invalid field") })
 	@PostMapping("userProfile/{userId}")
-	ResponseEntity<DataResponse<UserProfile>> createProfile(
+	ResponseEntity<DataResponse<UserProfileDto>> createProfile(
 			@PathVariable(name = "userId", required = true) @Nonnull final String userId,
-			@RequestBody(required = true) @Valid final UserProfileEditDto request,
+			@RequestBody(required = true) @Valid final UserProfileCreateDto request,
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidUserException;
 

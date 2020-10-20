@@ -42,9 +42,8 @@ public class UserServiceImpl implements UserService {
 	 * @return
 	 */
 	@Override
-	public Optional<User> getUser(@Nonnull final String userId, final boolean alsoVoided) {
-		// return this.userDao.findByUserIdAndVoided(userId, alsoVoided);
-		return null;
+	public Optional<User> findById(@Nonnull final String userId, final boolean alsoVoided) {
+		return this.userDao.findByIdAndVoided(userId, alsoVoided);
 	}
 
 	/**

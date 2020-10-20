@@ -18,10 +18,12 @@ import com.achiever.menschenfahren.controller.mapper.UserMapper;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
 import com.achiever.menschenfahren.entities.response.UserDto;
-import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
+import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
+import com.achiever.menschenfahren.entities.response.UserProfileDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidUserException;
+import com.achiever.menschenfahren.mapper.UserProfileMapper;
 import com.achiever.menschenfahren.service.UserService;
 
 /**
@@ -34,12 +36,16 @@ import com.achiever.menschenfahren.service.UserService;
 public class UserRestController extends BaseController implements UserRestControllerInterface {
 
 	private final UserMapper userMapper;
+
+	private final UserProfileMapper userProfileMapper;
+
 	@Autowired
 	private UserService userService;
 
 	public UserRestController() {
 		super();
-		userMapper = new UserMapper();
+		this.userMapper = new UserMapper();
+		this.userProfileMapper = new UserProfileMapper();
 	}
 
 	@Override
@@ -78,32 +84,50 @@ public class UserRestController extends BaseController implements UserRestContro
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<User>> getUser(final String userId, final boolean alsoVoided) {
-		final Optional<User> userOptional = this.userService.getUser(userId, alsoVoided);
+	public ResponseEntity<DataResponse<UserDto>> getUser(final String userId, final boolean alsoVoided) {
+		final Optional<User> userOptional = this.userService.findById(userId, alsoVoided);
 		if (!userOptional.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			final User user = userOptional.get();
-			if (!alsoVoided && user.isVoided()) {
-				return new ResponseEntity<>(HttpStatus.GONE);
+			final UserDto userDto = this.userMapper.convertUserToUserDto(user);
+
+			if (userDto != null) {
+				return buildResponse(userDto, HttpStatus.OK);
 			} else {
-				return buildResponse(user, HttpStatus.OK);
+				return new ResponseEntity<>(HttpStatus.GONE);
 			}
 		}
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<UserProfile>> createProfile(@Nonnull final String userId,
-			@Nonnull @Valid final UserProfileEditDto request, final boolean alsoVoided) throws InvalidUserException {
-//		final UserProfile userProfile = this.userMapper.map(request, UserProfile.class);
+	public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull final String userId,
+			@Nonnull @Valid final UserProfileCreateDto request, final boolean alsoVoided) throws InvalidUserException {
+//		final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
 //		final UserProfile savedUserProfile = this.userService.addProfile(userProfile, alsoVoided);
 //
-//		if (savedUserProfile != null) {
-//			return buildResponse(savedUserProfile, HttpStatus.CREATED);
-//		} else {
-//			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//		}
-		return null;
+//		final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
+
+		System.err.println(userId + "userId");
+		Optional<User> user = this.userService.findById(userId, alsoVoided);
+		System.err.println("in this position");
+		if (user.isPresent()) {
+			User savedUser = user.get();
+			System.err.println("Inside this position" + savedUser);
+			final UserProfile userProfile = this.userProfileMapper.convertUserProfileCreateDtoToUserProfile(request,
+					savedUser);
+			final UserProfile savedUserProfile = this.userService.addProfile(userProfile, alsoVoided);
+			final UserProfileDto userProfileDto = this.userProfileMapper
+					.convertUserProfileToUserProfileDto(savedUserProfile);
+			if (userProfileDto != null) {
+				return buildResponse(userProfileDto, HttpStatus.CREATED);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+
 	}
 
 }

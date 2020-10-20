@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
+import com.achiever.menschenfahren.controller.mapper.UserMapper;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
+import com.achiever.menschenfahren.entities.response.UserDto;
 import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
@@ -31,22 +33,37 @@ import com.achiever.menschenfahren.service.UserService;
 @RequestMapping(Constants.SERVICE_EVENT_API)
 public class UserRestController extends BaseController implements UserRestControllerInterface {
 
-	// private final UserMapper userMapper = new UserMapper();
-
+	private final UserMapper userMapper;
 	@Autowired
 	private UserService userService;
 
+	public UserRestController() {
+		super();
+		userMapper = new UserMapper();
+	}
+
 	@Override
-	public ResponseEntity<DataResponse<User>> createUser(@Valid final UserCreateDto request) {
-//		final User user = this.userMapper.map(request, User.class);
-//		final User savedUser = this.userService.addUser(user);
-//
-//		if (savedUser != null) {
-//			return buildResponse(savedUser, HttpStatus.CREATED);
-//		} else {
-//			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//		}
-		return null;
+	public ResponseEntity<DataResponse<UserDto>> createUser(@Valid final UserCreateDto request,
+			final boolean alsoVoided) {
+
+		System.err.println("inside createUser request" + request);
+
+		// final User user = userMapper.map(request, User.class);
+		// System.err.println(user + "####user");
+		// final User savedUser = userService.addUser(user);
+
+		// final UserDto savedUserDto = userMapper.map(savedUser, UserDto.class);
+		// System.err.println(savedUserDto + "####userDto saved");
+
+		final User user = this.userMapper.convertUserCreateDtoToUser(request);
+		final User savedUser = this.userService.addUser(user);
+
+		final UserDto savedUserDto = this.userMapper.convertUserToUserDto(savedUser);
+		if (savedUserDto != null) {
+			return buildResponse(savedUserDto, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 	}
 
 	@Override

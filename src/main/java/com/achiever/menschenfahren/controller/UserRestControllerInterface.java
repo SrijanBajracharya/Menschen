@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.constants.CommonConstants;
-import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
+import com.achiever.menschenfahren.entities.response.UserDto;
 import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
@@ -48,10 +48,11 @@ public interface UserRestControllerInterface {
 	@Operation(description = "Creates a new User.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "User was successfully created", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "Returned if the User data contained invalid field") })
 	@PostMapping("user")
-	ResponseEntity<DataResponse<User>> createUser(@RequestBody(required = true) @Valid final UserCreateDto request)
+	ResponseEntity<DataResponse<UserDto>> createUser(@RequestBody(required = true) @Valid final UserCreateDto request,
+			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidUserException;
 
 	/**
@@ -63,7 +64,7 @@ public interface UserRestControllerInterface {
 	 */
 	@Operation(description = "Return All Users.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found Users", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)) }),
 			@ApiResponse(responseCode = "204", description = "Found no visible User", content = @Content()),
 			@ApiResponse(responseCode = "400", description = "The user details is incomplete"),
 			@ApiResponse(responseCode = "410", description = "The user has been voided") })
@@ -86,7 +87,7 @@ public interface UserRestControllerInterface {
 	@Parameters(value = {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided users are also considered and returned.") })
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found the User", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)) }),
 			@ApiResponse(responseCode = "400", description = "The user details is incomplete"),
 			@ApiResponse(responseCode = "410", description = "The user has been voided"),
 			@ApiResponse(responseCode = "404", description = "No user found with the userId") })
@@ -109,7 +110,7 @@ public interface UserRestControllerInterface {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided users are also considered and returned.") })
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "UserProfile was successfully created", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserProfile.class)) }),
 			@ApiResponse(responseCode = "400", description = "Returned if the User Profile data contained invalid field") })
 	@PostMapping("userProfile/{userId}")
 	ResponseEntity<DataResponse<UserProfile>> createProfile(

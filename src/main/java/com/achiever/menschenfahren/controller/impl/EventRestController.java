@@ -17,7 +17,9 @@ import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.EventCreateDto;
+import com.achiever.menschenfahren.entities.response.EventDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
+import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.service.EventService;
 
 /**
@@ -32,7 +34,11 @@ public class EventRestController extends BaseController implements EventRestCont
 	@Autowired
 	private EventService eventService;
 
-	// private final EventMapper eventMapper = new EventMapper();
+	private final EventMapper eventMapper = new EventMapper();
+
+	public EventRestController() {
+		super();
+	}
 
 	@Override
 	public ResponseEntity<DataResponse<List<Event>>> getEvents(final boolean alsoVoided) {
@@ -62,13 +68,20 @@ public class EventRestController extends BaseController implements EventRestCont
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<Event>> createEvent(@Nonnull @Valid final EventCreateDto request)
+	public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request)
 			throws InvalidEventException {
-//		final Event event = this.eventMapper.map(request, Event.class);
-//		final Event savedEvent = this.eventService.createEvent(event);
-//
-//		return buildResponse(savedEvent, HttpStatus.CREATED);
-		return null;
+
+		final Event event = this.eventMapper.map(request, Event.class);
+		System.err.println(event + "####user");
+		final Event savedEvent = this.eventService.createEvent(event);
+
+		final EventDto savedEventDto = this.eventMapper.map(savedEvent, EventDto.class);
+		System.err.println(savedEventDto + "####userDto saved");
+		if (savedEventDto != null) {
+			return buildResponse(savedEventDto, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 	}
 
 	@Override

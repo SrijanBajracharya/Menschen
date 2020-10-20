@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = { "com.achiever.menschenfahren" })
 @PropertySource(MenschenFahrenApplication.PROPERTY_FILE)
 public class MenschenFahrenApplication {
 

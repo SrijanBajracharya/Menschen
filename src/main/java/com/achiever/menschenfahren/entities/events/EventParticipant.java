@@ -1,5 +1,8 @@
 package com.achiever.menschenfahren.entities.events;
 
+import java.util.UUID;
+
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -27,7 +30,8 @@ import lombok.ToString;
 public class EventParticipant {
 
 	@Id
-	private long id;
+	@Nonnull
+	private String id;
 
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -44,5 +48,9 @@ public class EventParticipant {
 	@Column(name = "status")
 	@Enumerated(EnumType.STRING)
 	private EventStatus status;
+
+	public EventParticipant() {
+		this.id = UUID.randomUUID().toString();
+	}
 
 }

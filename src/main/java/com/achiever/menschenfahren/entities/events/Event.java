@@ -1,40 +1,40 @@
 package com.achiever.menschenfahren.entities.events;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
+import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 import com.achiever.menschenfahren.entities.users.User;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 @Data
-@ToString
-@Entity
-@Table(name = "event")
-public class Event {
+@ToString(callSuper = true)
+@Entity(name = "event")
+@Table
+@EqualsAndHashCode(callSuper = true)
+public class Event extends AbstractBaseEntity {
 
 	@Id
-	@Column(name = "id")
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	private UUID id;
+	@Nonnull
+	private String id;
 
 	@ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -81,5 +81,14 @@ public class Event {
 
 	@Column(name = "voided", columnDefinition = "boolean default false")
 	private boolean voided;
+
+	@Column(name = "modified_Timestamp", nullable = false)
+	private Date modifiedTimestamp;
+
+	public Event() {
+		super();
+		this.id = UUID.randomUUID().toString();
+		this.modifiedTimestamp = this.createdTimestamp;
+	}
 
 }

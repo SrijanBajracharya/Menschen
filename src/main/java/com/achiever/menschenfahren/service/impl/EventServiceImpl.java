@@ -19,11 +19,6 @@ public class EventServiceImpl implements EventService {
 	@Autowired
 	private EventDaoInterface eventDao;
 
-//	@Autowired
-//	public EventServiceImpl(EventDaoInterface eventDao) {
-//		this.eventDao = eventDao;
-//	}
-
 	/**
 	 * Returns all the events based on the filter.
 	 *
@@ -32,13 +27,12 @@ public class EventServiceImpl implements EventService {
 	 */
 	@Override
 	public List<Event> getEvents(final boolean alsoVoided) {
-		List<Event> events = new ArrayList<>();
+		List<Event> events;
 		if (alsoVoided) {
 			events = eventDao.findAll();
+		} else {
+			events = eventDao.findByVoided(alsoVoided);
 		}
-//		else {
-//			events = eventDao.findByVoided(alsoVoided);
-//		}
 		return events;
 	}
 

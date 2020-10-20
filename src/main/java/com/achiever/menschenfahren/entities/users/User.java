@@ -1,58 +1,81 @@
 package com.achiever.menschenfahren.entities.users;
 
+import java.util.Date;
+import java.util.UUID;
+
+import javax.annotation.Nonnull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 import com.achiever.menschenfahren.models.AuthProviderType;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 @Data
-@ToString
-@Entity
-@Table(name = "users")
-public class User {
+@ToString(callSuper = true)
+@Entity(name = "users")
+@Table
+@EqualsAndHashCode(callSuper = true)
+public class User extends AbstractBaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	@Nonnull
+	private String id;
 
 	@Column(name = "first_name", length = 100)
+	@Nonnull
 	private String firstName;
 
 	@Column(name = "last_name", length = 100)
+	@Nonnull
 	private String lastName;
 
 	@Column(name = "email", length = 50)
+	@Nonnull
 	private String email;
 
 	@Column(name = "password", length = 600)
+	@Nonnull
 	private String password;
 
 	@Column(name = "auth_provider")
 	@Enumerated(EnumType.STRING)
 	private AuthProviderType authenticationType;
 
-	@Column(name = "created_timestamp")
-	private long createdTimestamp;
+	@Column(name = "modified_timestamp", nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modifiedTimestamp;
 
 	@Column(name = "voided")
 	private boolean voided;
 
 	@Column(name = "is_active")
-	private boolean isActive = true;
+	private boolean isActive;
 
 	@Column(name = "deactivated_timestamp")
-	private long deactivatedTimestamp;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date deactivatedTimestamp;
+
+	public User() {
+		super();
+		this.id = UUID.randomUUID().toString();
+		this.modifiedTimestamp = createdTimestamp;
+		this.isActive = true;
+		this.voided = false;
+		// this.authenticationType = AuthProviderType.OTHER;
+		// this.deactivatedTimestamp = null;
+	}
 
 }

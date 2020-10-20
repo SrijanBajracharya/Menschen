@@ -1,5 +1,6 @@
 package com.achiever.menschenfahren.entities.response;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -46,24 +47,19 @@ public class EventEditDto implements RestOperationDto {
 	private String countryCode;
 
 	@Schema(description = "The type of event")
-	@Nonnull
 	private EventType eventType;
 
 	@Schema(description = "The description about the event")
-	@Nonnull
 	private String description;
 
 	@Schema(description = "Age group suitable for the event")
-	@Nonnull
 	private String ageGroup;
 
 	@Schema(description = "The start date of the event")
-	@Nonnull
-	private long startDate;
+	private Date startDate;
 
 	@Schema(description = "The end date of the event")
-	@Nonnull
-	private long endDate;
+	private Date endDate;
 
 	@Schema(description = "Max Number of participants allowed for the event")
 	private int numberOfParticipants;
@@ -71,6 +67,4 @@ public class EventEditDto implements RestOperationDto {
 	@Schema(description = "The event if it is private or not")
 	private boolean isPrivate;
 
-	@Schema(description = "The event is voided or not")
-	private boolean voided;
 }

@@ -17,6 +17,7 @@ import com.achiever.menschenfahren.constants.CommonConstants;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.EventCreateDto;
+import com.achiever.menschenfahren.entities.response.EventDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 
 import io.swagger.oas.annotations.Operation;
@@ -79,11 +80,11 @@ public interface EventRestControllerInterface {
 	@Operation(description = "Creates a new Event.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Event was successfully created", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "Returned if the event data contained invalid field") })
 	@PostMapping("events")
-	ResponseEntity<DataResponse<Event>> createEvent(@RequestBody(required = true) @Valid final EventCreateDto request)
-			throws InvalidEventException;
+	ResponseEntity<DataResponse<EventDto>> createEvent(
+			@RequestBody(required = true) @Valid final EventCreateDto request) throws InvalidEventException;
 
 	/**
 	 * Finds events for an user.

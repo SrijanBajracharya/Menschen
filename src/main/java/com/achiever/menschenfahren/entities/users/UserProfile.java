@@ -1,21 +1,26 @@
 package com.achiever.menschenfahren.entities.users;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 import com.achiever.menschenfahren.entities.roles.Role;
 import com.achiever.menschenfahren.models.Gender;
 
@@ -29,14 +34,15 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "user_profiles")
-public class UserProfile {
+public class UserProfile extends AbstractBaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	@Nonnull
+	private String id;
 
 	@OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
+	@Nonnull
 	private User userId;
 
 	@OneToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
@@ -56,6 +62,7 @@ public class UserProfile {
 	private String photo;
 
 	@Column(name = "address")
+	@Nullable
 	private String address;
 
 	@Column(name = "gender")
@@ -69,15 +76,19 @@ public class UserProfile {
 	private boolean isPhoneNoValidated;
 
 	@Column(name = "description", length = 1500)
+	@Nullable
 	private String description;
 
 	@Column(name = "education")
+	@Nullable
 	private String education;
 
 	@Column(name = "hobbies")
+	@Nullable
 	private String hobbies;
 
 	@Column(name = "experiences")
+	@Nullable
 	private String experiences;
 
 	@Column(name = "verification_document")
@@ -85,5 +96,15 @@ public class UserProfile {
 
 	@Column(name = "voided")
 	private boolean voided;
+
+	@Column(name = "modified_timestamp", nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modifiedTimestamp;
+
+	public UserProfile() {
+		super();
+		this.id = UUID.randomUUID().toString();
+		this.modifiedTimestamp = createdTimestamp;
+	}
 
 }

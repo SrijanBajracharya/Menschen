@@ -6,15 +6,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.Nonnull;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.achiever.menschenfahren.dao.CountryDaoInterface;
 import com.achiever.menschenfahren.dao.RoleDaoInterface;
+import com.achiever.menschenfahren.dao.UserDaoInterface;
+import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.common.Country;
 import com.achiever.menschenfahren.entities.roles.Role;
+import com.achiever.menschenfahren.entities.users.User;
+import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.models.AppRole;
+import com.achiever.menschenfahren.models.AuthProviderType;
+import com.achiever.menschenfahren.models.Gender;
 
 /**
  * Component that is called druing initialization to allow create default
@@ -33,16 +41,60 @@ public class DbInitialization implements InitializingBean {
 	@Autowired
 	private CountryDaoInterface countryDao;
 
+	@Autowired
+	private UserDaoInterface userDao;
+
+	@Autowired
+	private UserProfileDaoInterface userProfileDao;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		initializeRole();
+		List<Role> savedRoles = initializeRole();
 		initializeCountries();
+		initializeAdminUser(savedRoles);
+	}
+
+	/**
+	 * Creating default admin user.
+	 * 
+	 * @param savedRoles
+	 */
+	private void initializeAdminUser(@Nonnull final List<Role> savedRoles) {
+		final User user = new User();
+		user.setFirstName("Admin");
+		user.setLastName("Admin");
+		user.setPassword("admin");
+		user.setEmail("admin@gmail.com");
+		user.setAuthenticationType(AuthProviderType.OTHER);
+		user.setVoided(false);
+		user.setActive(true);
+		User savedUser = userDao.save(user);
+		initializeAdminProfile(savedUser, savedRoles);
+	}
+
+	/**
+	 * Creating userProfile for admin user.
+	 * 
+	 * @param user
+	 * @param savedRoles
+	 */
+	private void initializeAdminProfile(@Nonnull final User user, @Nonnull List<Role> savedRoles) {
+		final UserProfile userProfile = new UserProfile();
+		userProfile.setAddress("Frankfurt");
+		userProfile.setEducation("Masters");
+		userProfile.setHobbies("Programming");
+		userProfile.setExperiences("Software companies");
+		userProfile.setGender(Gender.MALE);
+		userProfile.setUserId(user);
+		userProfile.setVoided(false);
+		userProfile.setRoleId(savedRoles);
+		userProfileDao.save(userProfile);
 	}
 
 	/**
 	 * Initializes the role.
 	 */
-	private void initializeRole() {
+	private List<Role> initializeRole() {
 
 		Role adminRole = new Role();
 		adminRole.setName(AppRole.ADMIN.getValue());
@@ -53,8 +105,8 @@ public class DbInitialization implements InitializingBean {
 		userRole.setDescription("The role for users");
 
 		Iterable<Role> iterableRoles = Arrays.asList(adminRole, userRole);
-		roleDao.saveAll(iterableRoles);
-
+		List<Role> savedRoles = roleDao.saveAll(iterableRoles);
+		return savedRoles;
 	}
 
 	/**

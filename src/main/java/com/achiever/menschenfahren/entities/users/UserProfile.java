@@ -25,15 +25,17 @@ import com.achiever.menschenfahren.entities.roles.Role;
 import com.achiever.menschenfahren.models.Gender;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 @Data
-@ToString
+@ToString(callSuper = true)
 @Entity
 @Table(name = "user_profiles")
+@EqualsAndHashCode(callSuper = true)
 public class UserProfile extends AbstractBaseEntity {
 
 	@Id

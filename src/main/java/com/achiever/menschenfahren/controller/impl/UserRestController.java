@@ -1,5 +1,6 @@
 package com.achiever.menschenfahren.controller.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
-import com.achiever.menschenfahren.controller.mapper.UserMapper;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
 import com.achiever.menschenfahren.entities.response.UserDto;
@@ -23,6 +23,7 @@ import com.achiever.menschenfahren.entities.response.UserProfileDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidUserException;
+import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.mapper.UserProfileMapper;
 import com.achiever.menschenfahren.service.UserService;
 
@@ -73,19 +74,25 @@ public class UserRestController extends BaseController implements UserRestContro
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<List<User>>> getUsers(final boolean alsoVoided) {
+	public ResponseEntity<DataResponse<List<UserDto>>> getUsers(final boolean alsoVoided) {
 		final List<User> users = this.userService.getUsers(alsoVoided);
 
-		if (users.isEmpty()) {
+		final List<UserDto> allUsers = new ArrayList<>();
+
+		for (final User user : users) {
+			allUsers.add(this.userMapper.convertUserToUserDto(user));
+		}
+
+		if (allUsers.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
-			return buildResponse(users, HttpStatus.OK);
+			return buildResponse(allUsers, HttpStatus.OK);
 		}
 	}
 
 	@Override
 	public ResponseEntity<DataResponse<UserDto>> getUser(final String userId, final boolean alsoVoided) {
-		final Optional<User> userOptional = this.userService.findById(userId, alsoVoided);
+		final Optional<User> userOptional = this.userService.findByIdAndVoided(userId, alsoVoided);
 		if (!userOptional.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
@@ -109,7 +116,7 @@ public class UserRestController extends BaseController implements UserRestContro
 //		final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
 
 		System.err.println(userId + "userId");
-		Optional<User> user = this.userService.findById(userId, alsoVoided);
+		Optional<User> user = this.userService.findByIdAndVoided(userId, alsoVoided);
 		System.err.println("in this position");
 		if (user.isPresent()) {
 			User savedUser = user.get();

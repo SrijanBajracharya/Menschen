@@ -1,4 +1,4 @@
-package com.achiever.menschenfahren.controller.mapper;
+package com.achiever.menschenfahren.mapper;
 
 import javax.annotation.Nonnull;
 

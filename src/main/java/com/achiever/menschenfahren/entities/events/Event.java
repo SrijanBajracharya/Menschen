@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 import com.achiever.menschenfahren.entities.users.User;
@@ -68,10 +70,12 @@ public class Event extends AbstractBaseEntity {
 	private String ageGroup;
 
 	@Column(name = "start_date")
-	private long startDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date startDate;
 
 	@Column(name = "end_date")
-	private long endDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date endDate;
 
 	@Column(name = "number_of_participants")
 	private int numberOfParticipants;

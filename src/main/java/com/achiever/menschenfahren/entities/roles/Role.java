@@ -10,17 +10,21 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 @Data
-@ToString
-@Entity
-@Table(name = "roles")
-public class Role {
+@ToString(callSuper = true)
+@Entity(name = "roles")
+@Table
+@EqualsAndHashCode(callSuper = true)
+public class Role extends AbstractBaseEntity {
 
 	@Id
 	@Nonnull
@@ -34,16 +38,11 @@ public class Role {
 	@Nullable
 	private String description;
 
-	@Column(name = "created_timestamp", nullable = false, updatable = false)
-	@Nonnull
-	private Date createdTimestamp;
-
 	@Column(name = "modified_timestamp", nullable = false)
 	private Date modifiedTimestamp;
 
 	public Role() {
 		this.id = UUID.randomUUID().toString();
-		this.createdTimestamp = new Date();
 		this.modifiedTimestamp = createdTimestamp;
 	}
 }

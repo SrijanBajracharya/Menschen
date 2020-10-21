@@ -20,7 +20,7 @@ public interface UserService {
 	 * @param eventId The id of the event.
 	 * @return
 	 */
-	Optional<User> findById(@Nonnull final String id, final boolean alsoVoided);
+	Optional<User> findByIdAndVoided(@Nonnull final String id, final boolean alsoVoided);
 
 	/**
 	 * Adds new User.
@@ -53,5 +53,7 @@ public interface UserService {
 	 * @return
 	 */
 	User changePassword(@NonNull final String uuid, @NonNull final String password);
+
+	Optional<User> findById(@Nonnull final String uuid);
 
 }

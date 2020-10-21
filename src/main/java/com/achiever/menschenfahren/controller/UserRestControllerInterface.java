@@ -71,7 +71,7 @@ public interface UserRestControllerInterface {
 	@Parameters(value = {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "Optional filter if voided events are also considered and returned.") })
 	@GetMapping("users")
-	ResponseEntity<DataResponse<List<User>>> getUsers(
+	ResponseEntity<DataResponse<List<UserDto>>> getUsers(
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidUserException;
 

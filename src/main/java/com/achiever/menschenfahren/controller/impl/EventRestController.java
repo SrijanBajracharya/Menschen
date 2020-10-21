@@ -1,5 +1,6 @@
 package com.achiever.menschenfahren.controller.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +19,11 @@ import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.EventCreateDto;
 import com.achiever.menschenfahren.entities.response.EventDto;
+import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.service.EventService;
+import com.achiever.menschenfahren.service.UserService;
 
 /**
  *
@@ -34,6 +37,9 @@ public class EventRestController extends BaseController implements EventRestCont
 	@Autowired
 	private EventService eventService;
 
+	@Autowired
+	private UserService userService;
+
 	private final EventMapper eventMapper = new EventMapper();
 
 	public EventRestController() {
@@ -41,28 +47,34 @@ public class EventRestController extends BaseController implements EventRestCont
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<List<Event>>> getEvents(final boolean alsoVoided) {
+	public ResponseEntity<DataResponse<List<EventDto>>> getEvents(final boolean alsoVoided) {
 		final List<Event> events = this.eventService.getEvents(alsoVoided);
 
-		if (events.isEmpty()) {
+		List<EventDto> eventDtoList = new ArrayList<>();
+		for (final Event event : events) {
+			eventDtoList.add(this.eventMapper.convertEventToEventDto(event));
+		}
+
+		if (eventDtoList.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
-			return buildResponse(events, HttpStatus.OK);
+			return buildResponse(eventDtoList, HttpStatus.OK);
 		}
 
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<Event>> getEvent(@Nonnull final String eventId, final boolean alsoVoided) {
+	public ResponseEntity<DataResponse<EventDto>> getEvent(@Nonnull final String eventId, final boolean alsoVoided) {
 		final Optional<Event> eventOptional = this.eventService.getEvent(eventId, alsoVoided);
 		if (!eventOptional.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			final Event event = eventOptional.get();
-			if (!alsoVoided && event.isVoided()) {
-				return new ResponseEntity<>(HttpStatus.GONE);
+			final EventDto eventDto = this.eventMapper.convertEventToEventDto(event);
+			if (eventDto != null) {
+				return buildResponse(eventDto, HttpStatus.OK);
 			} else {
-				return buildResponse(event, HttpStatus.OK);
+				return new ResponseEntity<>(HttpStatus.GONE);
 			}
 		}
 	}
@@ -71,28 +83,46 @@ public class EventRestController extends BaseController implements EventRestCont
 	public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request)
 			throws InvalidEventException {
 
-		final Event event = this.eventMapper.map(request, Event.class);
-		System.err.println(event + "####user");
-		final Event savedEvent = this.eventService.createEvent(event);
+//		final Event event = this.eventMapper.map(request, Event.class);
+//		System.err.println(event + "####user");
+//		final Event savedEvent = this.eventService.createEvent(event);
+//
+//		final EventDto savedEventDto = this.eventMapper.map(savedEvent, EventDto.class);
+//		System.err.println(savedEventDto + "####userDto saved");
 
-		final EventDto savedEventDto = this.eventMapper.map(savedEvent, EventDto.class);
-		System.err.println(savedEventDto + "####userDto saved");
-		if (savedEventDto != null) {
-			return buildResponse(savedEventDto, HttpStatus.CREATED);
+		Optional<User> user = this.userService.findById(request.getUserId());
+		if (user.isPresent()) {
+			User foundUser = user.get();
+			final Event event = this.eventMapper.convertEventCreateDtoToEvent(request, foundUser);
+			final Event savedEvent = this.eventService.createEvent(event);
+
+			final EventDto eventDto = this.eventMapper.convertEventToEventDto(savedEvent);
+			if (eventDto != null) {
+				return buildResponse(eventDto, HttpStatus.CREATED);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
 		} else {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<List<Event>>> getEventsByUserId(@Nonnull final String userId,
+	public ResponseEntity<DataResponse<List<EventDto>>> getEventsByUserId(@Nonnull final String userId,
 			final boolean alsoVoided) throws InvalidEventException {
 		final List<Event> events = this.eventService.getEventsByUserId(userId, alsoVoided);
 
-		if (events.isEmpty()) {
+		final List<EventDto> myEvents = new ArrayList<>();
+
+		for (Event event : events) {
+			myEvents.add(this.eventMapper.convertEventToEventDto(event));
+		}
+
+		if (myEvents.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} else {
-			return buildResponse(events, HttpStatus.OK);
+			return buildResponse(myEvents, HttpStatus.OK);
 		}
 	}
 

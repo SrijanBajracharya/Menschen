@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 import com.achiever.menschenfahren.entities.events.EventGallery;
 import com.achiever.menschenfahren.entities.events.EventRoute;
 import com.achiever.menschenfahren.entities.events.EventType;
-import com.achiever.menschenfahren.entities.users.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -27,7 +26,7 @@ public class EventEditDto implements RestOperationDto {
 
 	@Schema(description = "The user creating the event")
 	@Nonnull
-	private User user;
+	private String userId;
 
 	@Schema(description = "The name of event")
 	@Nonnull

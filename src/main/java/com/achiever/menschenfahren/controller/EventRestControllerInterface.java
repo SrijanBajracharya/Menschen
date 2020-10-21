@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.constants.CommonConstants;
-import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.EventCreateDto;
 import com.achiever.menschenfahren.entities.response.EventDto;
@@ -38,14 +37,14 @@ public interface EventRestControllerInterface {
 	 */
 	@Operation(description = "Return All Events.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found Events", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
 			@ApiResponse(responseCode = "204", description = "Found no visible Event", content = @Content()),
 			@ApiResponse(responseCode = "400", description = "The event details is incomplete"),
 			@ApiResponse(responseCode = "410", description = "The event has been voided") })
 	@Parameters(value = {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "Optional filter if voided events are also considered and returned.") })
 	@GetMapping("events")
-	ResponseEntity<DataResponse<List<Event>>> getEvents(
+	ResponseEntity<DataResponse<List<EventDto>>> getEvents(
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidEventException;
 
@@ -60,12 +59,12 @@ public interface EventRestControllerInterface {
 	@Parameters(value = {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided events are also considered and returned.") })
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found the Event", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "The event details is incomplete"),
 			@ApiResponse(responseCode = "410", description = "The event has been voided"),
 			@ApiResponse(responseCode = "404", description = "No Event found with the eventId") })
 	@GetMapping("events/{eventId}")
-	ResponseEntity<DataResponse<Event>> getEvent(
+	ResponseEntity<DataResponse<EventDto>> getEvent(
 			@PathVariable(name = "eventId", required = true) @Nonnull final String eventId,
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidEventException;
@@ -98,12 +97,12 @@ public interface EventRestControllerInterface {
 	@Parameters(value = {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided events are also considered and returned.") })
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found Events for an user", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Event.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "Returned if the event data contained invalid field"),
 			@ApiResponse(responseCode = "410", description = "The event has been voided"),
 			@ApiResponse(responseCode = "204", description = "Found no visible Event", content = @Content()) })
 	@GetMapping("events/{userId}")
-	ResponseEntity<DataResponse<List<Event>>> getEventsByUserId(
+	ResponseEntity<DataResponse<List<EventDto>>> getEventsByUserId(
 			@PathVariable(name = "userId", required = true) @Nonnull final String userId,
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidEventException;

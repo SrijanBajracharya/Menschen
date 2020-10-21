@@ -48,6 +48,7 @@ public class UserProfileMapper extends ConfigurableMapper {
 		userProfileDto.setHobbies(request.getHobbies());
 		userProfileDto.setPhoneNumber(request.getPhoneNumber());
 		userProfileDto.setUserId(request.getUserId());
+		userProfileDto.setId(request.getId());
 		return userProfileDto;
 	}
 

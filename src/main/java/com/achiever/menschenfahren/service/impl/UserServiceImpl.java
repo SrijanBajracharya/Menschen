@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 	 * @return
 	 */
 	@Override
-	public Optional<User> findById(@Nonnull final String userId, final boolean alsoVoided) {
+	public Optional<User> findByIdAndVoided(@Nonnull final String userId, final boolean alsoVoided) {
 		return this.userDao.findByIdAndVoided(userId, alsoVoided);
 	}
 
@@ -101,6 +101,11 @@ public class UserServiceImpl implements UserService {
 			throw new IllegalArgumentException("No user found with userId:" + uuid);
 		}
 
+	}
+
+	@Override
+	public Optional<User> findById(String uuid) {
+		return userDao.findById(uuid);
 	}
 
 }

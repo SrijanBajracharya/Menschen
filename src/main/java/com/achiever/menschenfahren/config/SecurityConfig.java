@@ -1,9 +1,5 @@
 package com.achiever.menschenfahren.config;
 
-import java.lang.reflect.AccessibleObject;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,14 +24,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	}
 
-	static void setAccessible(final AccessibleObject ao, final boolean accessible) {
-		if (System.getSecurityManager() == null) {
-			ao.setAccessible(accessible); // <~ Dragons
-		} else {
-			AccessController.doPrivileged((PrivilegedAction) () -> {
-				ao.setAccessible(accessible); // <~ moar Dragons
-				return null;
-			});
-		}
-	}
 }

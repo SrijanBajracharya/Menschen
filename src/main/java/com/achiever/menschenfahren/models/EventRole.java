@@ -1,22 +1,18 @@
 package com.achiever.menschenfahren.models;
 
 /**
- * CreatedBy : edangol
- * CreatedOn : 10/04/2020
- * Description :
+ * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 public enum EventRole {
-    PARTICIPANT("participant"),
-    COORDINATOR("coordinator"),
-    MODERATOR("moderator");
+	ADMIN("admin"), PARTICIPANT("participant"), COORDINATOR("coordinator"), MODERATOR("moderator");
 
-    private String value;
+	private String value;
 
-    EventRole(String role) {
-        this.value = role;
-    }
+	EventRole(String role) {
+		this.value = role;
+	}
 
-    public String getValue() {
-        return value;
-    }
+	public String getValue() {
+		return value;
+	}
 }

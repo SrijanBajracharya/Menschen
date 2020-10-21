@@ -12,39 +12,42 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 @Data
-@ToString
-@Entity
-@Table(name = "role_permissions")
-public class RolePermissions {
+@ToString(callSuper = true)
+@Entity(name = "role_permissions")
+@Table
+@EqualsAndHashCode(callSuper = true)
+public class RolePermissions extends AbstractBaseEntity {
 
 	@Id
 	@Nonnull
 	private String id;
 
 	@ManyToMany(targetEntity = Role.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "role_id", referencedColumnName = "id")
+	@JoinColumn(name = "id", referencedColumnName = "id")
 	private Set<Role> Role;
 
 	@Column(name = "section")
 	private String section;
 
-	@Column(name = "created_timestamp", nullable = false, updatable = false)
-	private Date createdTimestamp;
-
 	@Column(name = "modified_timestamp", nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date modifiedTimestamp;
 
 	public RolePermissions() {
 		this.id = UUID.randomUUID().toString();
-		this.createdTimestamp = new Date();
 		this.modifiedTimestamp = createdTimestamp;
 	}
 

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -14,15 +15,17 @@ import javax.persistence.TemporalType;
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * CreatedBy : edangol CreatedOn : 10/04/2020 Description :
  **/
 @Data
-@ToString
+@ToString(callSuper = true)
 @Entity
 @Table(name = "event_types")
+@EqualsAndHashCode(callSuper = true)
 public class EventType extends AbstractBaseEntity {
 
 	@Id
@@ -44,5 +47,13 @@ public class EventType extends AbstractBaseEntity {
 		super();
 		this.id = UUID.randomUUID().toString();
 		this.modifiedTimestamp = createdTimestamp;
+	}
+
+	public EventType(@Nonnull final String name, @Nullable final String description) {
+		super();
+		this.id = UUID.randomUUID().toString();
+		this.modifiedTimestamp = createdTimestamp;
+		this.name = name;
+		this.description = description;
 	}
 }

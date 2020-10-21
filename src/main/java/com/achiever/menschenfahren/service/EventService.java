@@ -15,7 +15,7 @@ public interface EventService {
 	 * @param alsoVoided Filters voided events.
 	 * @return
 	 */
-	List<Event> getEvents(final boolean alsoVoided);
+	List<Event> getEvents(final boolean alsoVoided, final boolean alsoPrivate);
 
 	/**
 	 * Returns event based on event id.
@@ -23,7 +23,7 @@ public interface EventService {
 	 * @param eventId The id of the event.
 	 * @return
 	 */
-	Optional<Event> getEvent(@Nonnull final String eventId, final boolean alsoVoided);
+	Optional<Event> getEvent(@Nonnull final String eventId, final boolean alsoVoided, final boolean alsoPrivate);
 
 	/**
 	 * Create new Event.

@@ -13,15 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.achiever.menschenfahren.dao.CountryDaoInterface;
+import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.dao.RoleDaoInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.common.Country;
+import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.roles.Role;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.models.AppRole;
 import com.achiever.menschenfahren.models.AuthProviderType;
+import com.achiever.menschenfahren.models.EventTypes;
 import com.achiever.menschenfahren.models.Gender;
 
 /**
@@ -47,16 +50,35 @@ public class DbInitialization implements InitializingBean {
 	@Autowired
 	private UserProfileDaoInterface userProfileDao;
 
+	@Autowired
+	private EventTypeDaoInterface eventTypeDao;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		List<Role> savedRoles = initializeRole();
 		initializeCountries();
 		initializeAdminUser(savedRoles);
+
+		initializeEventTypes();
+	}
+
+	private void initializeEventTypes() {
+		EventType seminarType = new EventType(EventTypes.SEMINAR.getValue(),
+				"Event which can happen for multiple days");
+		EventType conferenceType = new EventType(EventTypes.CONFERENCE.getValue(), "Event which happen for a day");
+		EventType picnicType = new EventType(EventTypes.PICNIC.getValue(), "Event for  a day");
+		EventType trekType = new EventType(EventTypes.TREK.getValue(), "Travel for multiple days by foot");
+		EventType hikeType = new EventType(EventTypes.HIKE.getValue(), "Travel for a day");
+		EventType gatheringType = new EventType(EventTypes.GATHERING.getValue(), "Event for few hours.");
+
+		Iterable<EventType> iterableEventType = Arrays.asList(seminarType, conferenceType, picnicType, trekType,
+				hikeType, gatheringType);
+		eventTypeDao.saveAll(iterableEventType);
 	}
 
 	/**
 	 * Creating default admin user.
-	 * 
+	 *
 	 * @param savedRoles
 	 */
 	private void initializeAdminUser(@Nonnull final List<Role> savedRoles) {
@@ -74,7 +96,7 @@ public class DbInitialization implements InitializingBean {
 
 	/**
 	 * Creating userProfile for admin user.
-	 * 
+	 *
 	 * @param user
 	 * @param savedRoles
 	 */

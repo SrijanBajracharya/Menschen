@@ -26,13 +26,8 @@ public class EventServiceImpl implements EventService {
 	 * @return
 	 */
 	@Override
-	public List<Event> getEvents(final boolean alsoVoided) {
-		List<Event> events;
-		if (alsoVoided) {
-			events = eventDao.findAll();
-		} else {
-			events = eventDao.findByVoided(alsoVoided);
-		}
+	public List<Event> getEvents(final boolean alsoVoided, final boolean alsoPrivate) {
+		List<Event> events = eventDao.findByVoidedAndIsPrivate(alsoVoided, alsoPrivate);
 		return events;
 	}
 
@@ -43,9 +38,10 @@ public class EventServiceImpl implements EventService {
 	 * @return
 	 */
 	@Override
-	public Optional<Event> getEvent(@Nonnull final String eventId, final boolean alsoVoided) {
-		// return this.eventDao.findByEventIdAndVoided(eventId, alsoVoided);
-		return null;
+	public Optional<Event> getEvent(@Nonnull final String eventId, final boolean alsoVoided,
+			final boolean alsoPrivate) {
+		return this.eventDao.findByIdAndVoidedAndIsPrivate(eventId, alsoVoided, alsoPrivate);
+		// return null;
 	}
 
 	/**

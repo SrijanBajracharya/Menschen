@@ -5,6 +5,8 @@ public class CommonConstants {
 	public class Params {
 
 		public static final String ALSO_VOIDED = "alsoVoided";
+
+		public static final String ALSO_PRIVATE = "alsoPrivate";
 	}
 
 }

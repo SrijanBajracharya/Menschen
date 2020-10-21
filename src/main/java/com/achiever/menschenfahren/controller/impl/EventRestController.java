@@ -47,8 +47,8 @@ public class EventRestController extends BaseController implements EventRestCont
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<List<EventDto>>> getEvents(final boolean alsoVoided) {
-		final List<Event> events = this.eventService.getEvents(alsoVoided);
+	public ResponseEntity<DataResponse<List<EventDto>>> getEvents(final boolean alsoVoided, final boolean alsoPrivate) {
+		final List<Event> events = this.eventService.getEvents(alsoVoided, alsoPrivate);
 
 		List<EventDto> eventDtoList = new ArrayList<>();
 		for (final Event event : events) {
@@ -64,8 +64,9 @@ public class EventRestController extends BaseController implements EventRestCont
 	}
 
 	@Override
-	public ResponseEntity<DataResponse<EventDto>> getEvent(@Nonnull final String eventId, final boolean alsoVoided) {
-		final Optional<Event> eventOptional = this.eventService.getEvent(eventId, alsoVoided);
+	public ResponseEntity<DataResponse<EventDto>> getEvent(@Nonnull final String eventId, final boolean alsoVoided,
+			final boolean alsoPrivate) {
+		final Optional<Event> eventOptional = this.eventService.getEvent(eventId, alsoVoided, alsoPrivate);
 		if (!eventOptional.isPresent()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {

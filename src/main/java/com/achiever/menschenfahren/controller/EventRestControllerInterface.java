@@ -45,7 +45,8 @@ public interface EventRestControllerInterface {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "Optional filter if voided events are also considered and returned.") })
 	@GetMapping("events")
 	ResponseEntity<DataResponse<List<EventDto>>> getEvents(
-			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
+			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided,
+			@RequestParam(name = CommonConstants.Params.ALSO_PRIVATE, defaultValue = "false", required = false) final boolean alsoPrivate)
 			throws InvalidEventException;
 
 	/**
@@ -66,7 +67,8 @@ public interface EventRestControllerInterface {
 	@GetMapping("events/{eventId}")
 	ResponseEntity<DataResponse<EventDto>> getEvent(
 			@PathVariable(name = "eventId", required = true) @Nonnull final String eventId,
-			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
+			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided,
+			@RequestParam(name = CommonConstants.Params.ALSO_PRIVATE, defaultValue = "false", required = false) final boolean alsoPrivate)
 			throws InvalidEventException;
 
 	/**

@@ -10,9 +10,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.achiever.menschenfahren.dao.UserDaoInterface;
-import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.service.UserService;
 
 @Service
@@ -20,9 +18,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDaoInterface userDao;
-
-	@Autowired
-	private UserProfileDaoInterface userProfileDao;
 
 	@Override
 	public List<User> getUsers(final boolean alsoVoided) {
@@ -59,17 +54,6 @@ public class UserServiceImpl implements UserService {
 			userDao.save(user);
 		}
 		return user;
-	}
-
-	/**
-	 *
-	 * @param userProfile
-	 * @param alsoVoided
-	 * @return
-	 */
-	@Override
-	public UserProfile addProfile(@Nonnull final UserProfile userProfile, final boolean alsoVoided) {
-		return userProfileDao.save(userProfile);
 	}
 
 	/**

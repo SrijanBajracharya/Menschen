@@ -42,4 +42,8 @@ public interface EventService {
 	 */
 	List<Event> getEventsByUserId(@Nonnull final String userId, final boolean alsoVoided);
 
+	Optional<Event> findById(@Nonnull final String id);
+
+	Event merge(@Nonnull final Event event);
+
 }

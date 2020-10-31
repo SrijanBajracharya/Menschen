@@ -38,6 +38,9 @@ public class Event extends AbstractBaseEntity {
 	@Nonnull
 	private String id;
 
+//	@Nonnull
+//	private String userId;
+
 	@ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")
 	private User user;

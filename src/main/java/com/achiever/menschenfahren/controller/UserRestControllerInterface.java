@@ -17,9 +17,6 @@ import com.achiever.menschenfahren.constants.CommonConstants;
 import com.achiever.menschenfahren.entities.response.DataResponse;
 import com.achiever.menschenfahren.entities.response.UserCreateDto;
 import com.achiever.menschenfahren.entities.response.UserDto;
-import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
-import com.achiever.menschenfahren.entities.response.UserProfileDto;
-import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 
@@ -64,7 +61,7 @@ public interface UserRestControllerInterface {
 	 */
 	@Operation(description = "Return All Users.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found Users", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
 			@ApiResponse(responseCode = "204", description = "Found no visible User", content = @Content()),
 			@ApiResponse(responseCode = "400", description = "The user details is incomplete"),
 			@ApiResponse(responseCode = "410", description = "The user has been voided") })
@@ -87,35 +84,13 @@ public interface UserRestControllerInterface {
 	@Parameters(value = {
 			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided users are also considered and returned.") })
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Found the User", content = {
-			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)) }),
+			@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
 			@ApiResponse(responseCode = "400", description = "The user details is incomplete"),
 			@ApiResponse(responseCode = "410", description = "The user has been voided"),
 			@ApiResponse(responseCode = "404", description = "No user found with the userId") })
 	@GetMapping("users/{userId}")
 	ResponseEntity<DataResponse<UserDto>> getUser(
 			@PathVariable(name = "userId", required = true) @Nonnull final String userId,
-			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
-			throws InvalidUserException;
-
-	/**
-	 *
-	 * @param userId
-	 * @param request
-	 * @param alsoVoided
-	 * @return
-	 * @throws InvalidUserException
-	 */
-	@Operation(description = "Creates user profile for the given userId.")
-	@Parameters(value = {
-			@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided users are also considered and returned.") })
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "201", description = "UserProfile was successfully created", content = {
-					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserProfileCreateDto.class)) }),
-			@ApiResponse(responseCode = "400", description = "Returned if the User Profile data contained invalid field") })
-	@PostMapping("userProfile/{userId}")
-	ResponseEntity<DataResponse<UserProfileDto>> createProfile(
-			@PathVariable(name = "userId", required = true) @Nonnull final String userId,
-			@RequestBody(required = true) @Valid final UserProfileCreateDto request,
 			@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
 			throws InvalidUserException;
 

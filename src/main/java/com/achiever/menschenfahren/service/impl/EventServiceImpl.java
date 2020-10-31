@@ -1,6 +1,5 @@
 package com.achiever.menschenfahren.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,9 +63,18 @@ public class EventServiceImpl implements EventService {
 	 */
 	@Override
 	public List<Event> getEventsByUserId(@Nonnull final String userId, final boolean alsoVoided) {
-		// final List<Event> events = eventDao.findByUserIdAndVoided(userId,
-		// alsoVoided);
-		return new ArrayList<>();
+		final List<Event> events = eventDao.findByUserIdAndVoided(userId, alsoVoided);
+		return events;
+	}
+
+	@Override
+	public Optional<Event> findById(@Nonnull final String id) {
+		return this.eventDao.findById(id);
+	}
+
+	@Override
+	public Event merge(@Nonnull final Event event) {
+		return this.eventDao.save(event);
 	}
 
 }

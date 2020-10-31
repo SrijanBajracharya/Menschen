@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 import org.springframework.lang.NonNull;
 
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.entities.users.UserProfile;
 
 public interface UserService {
 
@@ -29,14 +28,6 @@ public interface UserService {
 	 * @return
 	 */
 	User addUser(@NonNull final User user);
-
-	/**
-	 *
-	 * @param userProfile
-	 * @param alsoVoided
-	 * @return
-	 */
-	UserProfile addProfile(@Nonnull final UserProfile userProfile, final boolean alsoVoided);
 
 	/**
 	 * De-activates user.

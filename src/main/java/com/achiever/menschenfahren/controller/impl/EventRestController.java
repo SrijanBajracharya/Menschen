@@ -173,11 +173,12 @@ public class EventRestController extends BaseController implements EventRestCont
     @Override
     public ResponseEntity<DataResponse<EventDto>> editEvent(@Nonnull final String eventId, @Valid final EventEditDto request) throws ResourceNotFoundException {
         final Event event = getEventById(eventId);
-
         eventMapper.map(request, event);
 
         final Event savedEvent = eventService.createEvent(event);
-        return buildResponse(eventMapper.map(savedEvent, EventDto.class), HttpStatus.OK);
+        final EventDto response = eventMapper.map(savedEvent, EventDto.class);
+        response.setUserId(savedEvent.getUser().getId());
+        return buildResponse(response, HttpStatus.OK);
     }
 
     /**

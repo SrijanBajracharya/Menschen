@@ -72,7 +72,7 @@ public interface EventRestControllerInterface {
             @ApiResponse(responseCode = "400", description = "The event details is incomplete"),
             @ApiResponse(responseCode = "410", description = "The event has been voided"),
             @ApiResponse(responseCode = "404", description = "No Event found with the eventId") })
-    @GetMapping("events/{eventId}")
+    @GetMapping("event/{eventId}")
     ResponseEntity<DataResponse<EventDto>> getEvent(@PathVariable(name = "eventId", required = true) @Nonnull final String eventId,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided,
             @RequestParam(name = CommonConstants.Params.ALSO_PRIVATE, defaultValue = "false", required = false) final boolean alsoPrivate)
@@ -172,7 +172,7 @@ public interface EventRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The given event wasn't valid for an update operation."),
             @ApiResponse(responseCode = "404", description = "The event with the given id doesn't exist", content = @Content()) })
-    @PatchMapping("events/{eventId}")
+    @PatchMapping("events/{" + CommonConstants.Params.EVENT_ID + "}/edit")
     ResponseEntity<DataResponse<EventDto>> editEvent(@PathVariable(name = CommonConstants.Params.EVENT_ID, required = true) @Nonnull final String eventId,
             @RequestBody(required = true) @Valid final EventEditDto request) throws ResourceNotFoundException;
 

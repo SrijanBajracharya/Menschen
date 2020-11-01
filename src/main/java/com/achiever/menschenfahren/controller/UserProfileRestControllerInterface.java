@@ -93,7 +93,7 @@ public interface UserProfileRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The given user wasn't valid for an update operation."),
             @ApiResponse(responseCode = "404", description = "The user with the given id doesn't exist", content = @Content()) })
-    @PatchMapping("events/{" + CommonConstants.Params.USER_PROFILE_ID + "}")
+    @PatchMapping("userProfile/{" + CommonConstants.Params.USER_PROFILE_ID + "}/edit")
     ResponseEntity<DataResponse<UserProfileDto>> editProfile(
             @PathVariable(name = CommonConstants.Params.USER_PROFILE_ID, required = true) @Nonnull final String userProfileId,
             @RequestBody(required = true) @Valid final UserProfileEditDto request) throws ResourceNotFoundException;

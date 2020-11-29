@@ -57,7 +57,8 @@ public class EventRestController extends BaseController implements EventRestCont
 
         final List<EventDto> eventDtoList = new ArrayList<>();
         for (final Event event : events) {
-            eventDtoList.add(this.eventMapper.convertEventToEventDto(event));
+            final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
+            eventDtoList.add(eventDto);
         }
 
         if (eventDtoList.isEmpty()) {
@@ -78,7 +79,7 @@ public class EventRestController extends BaseController implements EventRestCont
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             final Event event = eventOptional.get();
-            final EventDto eventDto = this.eventMapper.convertEventToEventDto(event);
+            final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             if (eventDto != null) {
                 return buildResponse(eventDto, HttpStatus.OK);
             } else {
@@ -93,20 +94,15 @@ public class EventRestController extends BaseController implements EventRestCont
     @Override
     public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request) throws InvalidEventException {
 
-        // final Event event = this.eventMapper.map(request, Event.class);
-        // System.err.println(event + "####user");
-        // final Event savedEvent = this.eventService.createEvent(event);
-        //
-        // final EventDto savedEventDto = this.eventMapper.map(savedEvent, EventDto.class);
-        // System.err.println(savedEventDto + "####userDto saved");
-
         final Optional<User> user = this.userService.findById(request.getUserId());
+
         if (user.isPresent()) {
             final User foundUser = user.get();
-            final Event event = this.eventMapper.convertEventCreateDtoToEvent(request, foundUser);
+            final Event event = this.eventMapper.map(request, Event.class);
+            event.setUser(foundUser);
             final Event savedEvent = this.eventService.createEvent(event);
 
-            final EventDto eventDto = this.eventMapper.convertEventToEventDto(savedEvent);
+            final EventDto eventDto = this.eventMapper.map(savedEvent, EventDto.class);
             if (eventDto != null) {
                 return buildResponse(eventDto, HttpStatus.CREATED);
             } else {
@@ -128,7 +124,8 @@ public class EventRestController extends BaseController implements EventRestCont
         final List<EventDto> myEvents = new ArrayList<>();
 
         for (final Event event : events) {
-            myEvents.add(this.eventMapper.convertEventToEventDto(event));
+            final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
+            myEvents.add(eventDto);
         }
 
         if (myEvents.isEmpty()) {

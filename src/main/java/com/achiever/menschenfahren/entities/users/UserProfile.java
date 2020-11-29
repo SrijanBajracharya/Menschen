@@ -38,75 +38,74 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class UserProfile extends AbstractBaseEntity {
 
-	@Id
-	@Nonnull
-	private String id;
+    @Id
+    @Nonnull
+    private String     id;
 
-	@OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "user_id", referencedColumnName = "id")
-	@Nonnull
-	private User userId;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User       user;
 
-	@OneToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
-	@JoinColumn(name = "role_id", referencedColumnName = "id")
-	private List<Role> roleId;
+    @OneToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private List<Role> roleId;
 
-	@Column(name = "dob")
-	private String dateOfBirth;
+    @Column(name = "dob")
+    private String     dateOfBirth;
 
-	@Column(name = "terms_and_agreement")
-	private boolean termsAndAgreement = true;
+    @Column(name = "terms_and_agreement")
+    private boolean    termsAndAgreement = true;
 
-	@Column(name = "timezone")
-	private String timezone;
+    @Column(name = "timezone")
+    private String     timezone;
 
-	@Column(name = "photo")
-	private String photo;
+    @Column(name = "photo")
+    private String     photo;
 
-	@Column(name = "address")
-	@Nullable
-	private String address;
+    @Column(name = "address")
+    @Nullable
+    private String     address;
 
-	@Column(name = "gender")
-	@Enumerated(EnumType.STRING)
-	private Gender gender;
+    @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
+    private Gender     gender;
 
-	@Column(name = "phone_number", length = 30)
-	private String phoneNumber;
+    @Column(name = "phone_number", length = 30)
+    private String     phoneNumber;
 
-	@Column(name = "is_phone_number_valid")
-	private boolean isPhoneNoValidated;
+    @Column(name = "is_phone_number_valid")
+    private boolean    isPhoneNoValidated;
 
-	@Column(name = "description", length = 1500)
-	@Nullable
-	private String description;
+    @Column(name = "description", length = 1500)
+    @Nullable
+    private String     description;
 
-	@Column(name = "education")
-	@Nullable
-	private String education;
+    @Column(name = "education")
+    @Nullable
+    private String     education;
 
-	@Column(name = "hobbies")
-	@Nullable
-	private String hobbies;
+    @Column(name = "hobbies")
+    @Nullable
+    private String     hobbies;
 
-	@Column(name = "experiences")
-	@Nullable
-	private String experiences;
+    @Column(name = "experiences")
+    @Nullable
+    private String     experiences;
 
-	@Column(name = "verification_document")
-	private String verificationDocument;
+    @Column(name = "verification_document")
+    private String     verificationDocument;
 
-	@Column(name = "voided")
-	private boolean voided;
+    @Column(name = "voided")
+    private boolean    voided;
 
-	@Column(name = "modified_timestamp", nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date modifiedTimestamp;
+    @Column(name = "modified_timestamp", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date       modifiedTimestamp;
 
-	public UserProfile() {
-		super();
-		this.id = UUID.randomUUID().toString();
-		this.modifiedTimestamp = createdTimestamp;
-	}
+    public UserProfile() {
+        super();
+        this.id = UUID.randomUUID().toString();
+        this.modifiedTimestamp = createdTimestamp;
+    }
 
 }

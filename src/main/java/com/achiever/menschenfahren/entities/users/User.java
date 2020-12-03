@@ -13,8 +13,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.achiever.menschenfahren.base.model.AuthProviderType;
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
-import com.achiever.menschenfahren.models.AuthProviderType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,52 +30,52 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class User extends AbstractBaseEntity {
 
-	@Id
-	@Nonnull
-	private String id;
+    @Id
+    @Nonnull
+    private String           id;
 
-	@Column(name = "first_name", length = 100)
-	@Nonnull
-	private String firstName;
+    @Column(name = "first_name", length = 100)
+    @Nonnull
+    private String           firstName;
 
-	@Column(name = "last_name", length = 100)
-	@Nonnull
-	private String lastName;
+    @Column(name = "last_name", length = 100)
+    @Nonnull
+    private String           lastName;
 
-	@Column(name = "email", length = 50)
-	@Nonnull
-	private String email;
+    @Column(name = "email", length = 50)
+    @Nonnull
+    private String           email;
 
-	@Column(name = "password", length = 600)
-	@Nonnull
-	private String password;
+    @Column(name = "password", length = 600)
+    @Nonnull
+    private String           password;
 
-	@Column(name = "auth_provider")
-	@Enumerated(EnumType.STRING)
-	private AuthProviderType authenticationType;
+    @Column(name = "auth_provider")
+    @Enumerated(EnumType.STRING)
+    private AuthProviderType authenticationType;
 
-	@Column(name = "modified_timestamp", nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date modifiedTimestamp;
+    @Column(name = "modified_timestamp", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date             modifiedTimestamp;
 
-	@Column(name = "voided")
-	private boolean voided;
+    @Column(name = "voided")
+    private boolean          voided;
 
-	@Column(name = "is_active")
-	private boolean isActive;
+    @Column(name = "is_active")
+    private boolean          isActive;
 
-	@Column(name = "deactivated_timestamp")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date deactivatedTimestamp;
+    @Column(name = "deactivated_timestamp")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date             deactivatedTimestamp;
 
-	public User() {
-		super();
-		this.id = UUID.randomUUID().toString();
-		this.modifiedTimestamp = createdTimestamp;
-		this.isActive = true;
-		this.voided = false;
-		// this.authenticationType = AuthProviderType.OTHER;
-		// this.deactivatedTimestamp = null;
-	}
+    public User() {
+        super();
+        this.id = UUID.randomUUID().toString();
+        this.modifiedTimestamp = createdTimestamp;
+        this.isActive = true;
+        this.voided = false;
+        // this.authenticationType = AuthProviderType.OTHER;
+        // this.deactivatedTimestamp = null;
+    }
 
 }

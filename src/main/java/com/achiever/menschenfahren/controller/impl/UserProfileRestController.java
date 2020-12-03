@@ -11,12 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
+import com.achiever.menschenfahren.base.dto.UserProfileDto;
+import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserProfileRestControllerInterface;
-import com.achiever.menschenfahren.entities.response.DataResponse;
-import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
-import com.achiever.menschenfahren.entities.response.UserProfileDto;
-import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidUserException;
@@ -44,7 +44,7 @@ public class UserProfileRestController extends BaseController implements UserPro
         final Optional<User> user = this.userService.findByIdAndVoided(userId, alsoVoided);
         if (user.isPresent()) {
             final User savedUser = user.get();
-            request.setUserId(savedUser);
+            request.setUserId(userId);
             final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
             final UserProfile savedUserProfile = this.userProfileService.addProfile(userProfile, alsoVoided);
             final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);

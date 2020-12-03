@@ -12,11 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.UserDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
-import com.achiever.menschenfahren.entities.response.DataResponse;
-import com.achiever.menschenfahren.entities.response.UserCreateDto;
-import com.achiever.menschenfahren.entities.response.UserDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.UserService;

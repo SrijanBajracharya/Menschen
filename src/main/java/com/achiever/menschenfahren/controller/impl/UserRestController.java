@@ -63,7 +63,6 @@ public class UserRestController extends BaseController implements UserRestContro
      */
     @Override
     public ResponseEntity<DataResponse<List<UserDto>>> getUsers(final boolean alsoVoided) {
-        System.err.println("inside getUsers" + alsoVoided);
         final List<User> users = this.userService.getUsers(alsoVoided);
 
         final List<UserDto> allUsers = new ArrayList<>();

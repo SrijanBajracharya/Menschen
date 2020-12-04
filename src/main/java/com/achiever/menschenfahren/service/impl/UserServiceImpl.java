@@ -21,15 +21,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsers(final boolean alsoVoided) {
-        System.err.println("inside this method#####");
         final List<User> users;
         if (alsoVoided) {
-            System.err.println("Inside alsovoided " + alsoVoided);
             users = userDao.findAll();
-            System.err.println("users### " + users);
         } else {
             users = userDao.findByVoided(alsoVoided);
-            System.err.println(users + "###haha");
         }
         return users;
     }

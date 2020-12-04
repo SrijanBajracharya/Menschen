@@ -81,14 +81,11 @@ public class UserRestController extends BaseController implements UserRestContro
 
     @Override
     public ResponseEntity<DataResponse<UserDto>> getUser(final String userId, final boolean alsoVoided) {
-        System.err.println("inside getUser" + userId + "###" + alsoVoided);
         final Optional<User> userOptional = this.userService.findByIdAndVoided(userId, alsoVoided);
         if (!userOptional.isPresent()) {
-            System.err.println("not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             final User user = userOptional.get();
-            System.err.println(user + "####user");
             final UserDto userDto = this.userMapper.map(user, UserDto.class);
 
             if (userDto != null) {

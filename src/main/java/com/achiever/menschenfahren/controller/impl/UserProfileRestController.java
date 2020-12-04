@@ -37,6 +37,9 @@ public class UserProfileRestController extends BaseController implements UserPro
     @Autowired
     private UserService             userService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull final String userId, @Nonnull @Valid final UserProfileCreateDto request,
             final boolean alsoVoided) throws InvalidUserException {
@@ -59,6 +62,9 @@ public class UserProfileRestController extends BaseController implements UserPro
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
         final UserProfile userProfile = this.findUserProfileById(id);
@@ -67,6 +73,9 @@ public class UserProfileRestController extends BaseController implements UserPro
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> editProfile(@Nonnull final String userProfileId, @Valid final UserProfileEditDto request)
             throws ResourceNotFoundException {
@@ -77,6 +86,15 @@ public class UserProfileRestController extends BaseController implements UserPro
         return buildResponse(userProfileMapper.map(savedUserProfile, UserProfileDto.class), HttpStatus.OK);
     }
 
+    /**
+     * Find User profile by the id.
+     *
+     * @param id
+     *            The identifier of user profile.
+     * @return User profile
+     * @throws ResourceNotFoundException
+     *             Thrown if the resource is not found.
+     */
     private UserProfile findUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
         final Optional<UserProfile> userProfileOptional = this.userProfileService.findById(id);
         if (userProfileOptional.isEmpty()) {

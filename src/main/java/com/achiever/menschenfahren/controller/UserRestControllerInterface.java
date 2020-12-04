@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.achiever.menschenfahren.base.constants.CommonConstants;
 import com.achiever.menschenfahren.base.dto.DataResponse;
 import com.achiever.menschenfahren.base.dto.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.UserDto;
-import com.achiever.menschenfahren.constants.CommonConstants;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 

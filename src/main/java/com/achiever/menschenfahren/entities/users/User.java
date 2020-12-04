@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 
 import com.achiever.menschenfahren.base.model.AuthProviderType;
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
@@ -26,7 +27,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @Entity(name = "users")
-@Table
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
 @EqualsAndHashCode(callSuper = true)
 public class User extends AbstractBaseEntity {
 

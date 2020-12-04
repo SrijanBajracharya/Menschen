@@ -11,9 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
+import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -47,14 +51,18 @@ public class UserServiceImpl implements UserService {
      *
      * @param user
      * @return
+     * @throws InvalidUserException
      */
     @Override
-    public User addUser(@NonNull final User user) {
+    public User addUser(@NonNull final User user) throws InvalidUserException {
         final User userExists = userDao.findByEmail(user.getEmail());
+        User savedUser = null;
         if (userExists == null) {
-            userDao.save(user);
+            savedUser = userDao.save(user);
+        } else {
+            throw new InvalidUserException("Email and/or username must be unique.");
         }
-        return user;
+        return savedUser;
     }
 
     /**

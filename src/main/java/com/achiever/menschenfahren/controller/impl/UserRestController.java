@@ -18,6 +18,7 @@ import com.achiever.menschenfahren.base.dto.UserDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.entities.users.User;
+import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.UserService;
 
@@ -44,7 +45,7 @@ public class UserRestController extends BaseController implements UserRestContro
      * Creates a new user.
      */
     @Override
-    public ResponseEntity<DataResponse<UserDto>> createUser(@Valid final UserCreateDto request, final boolean alsoVoided) {
+    public ResponseEntity<DataResponse<UserDto>> createUser(@Valid final UserCreateDto request, final boolean alsoVoided) throws InvalidUserException {
 
         final User user = userMapper.map(request, User.class);
         final User savedUser = userService.addUser(user);

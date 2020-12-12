@@ -190,7 +190,7 @@ public class EventRestController extends BaseController implements EventRestCont
     @Nonnull
     private Event getEventById(@Nonnull final String eventId) throws ResourceNotFoundException {
         final Optional<Event> eventOptional = this.eventService.findById(eventId);
-        if (eventOptional.isEmpty()) {
+        if (!eventOptional.isPresent()) {
             throw new ResourceNotFoundException("No Event found with id:" + eventId);
         }
         final Event event = eventOptional.get();

@@ -97,7 +97,7 @@ public class UserProfileRestController extends BaseController implements UserPro
      */
     private UserProfile findUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
         final Optional<UserProfile> userProfileOptional = this.userProfileService.findById(id);
-        if (userProfileOptional.isEmpty()) {
+        if (!userProfileOptional.isPresent()) {
             throw new ResourceNotFoundException("No User profile found with id:" + id);
         }
         final UserProfile userProfile = userProfileOptional.get();

@@ -34,68 +34,68 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class Event extends AbstractBaseEntity {
 
-	@Id
-	@Nonnull
-	private String id;
+    @Id
+    @Nonnull
+    private String             id;
 
-//	@Nonnull
-//	private String userId;
+    // @Nonnull
+    // private String userId;
 
-	@ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", referencedColumnName = "id")
-	private User user;
+    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User               user;
 
-	@Column(name = "name", length = 100)
-	private String name;
+    @Column(name = "name", length = 100)
+    private String             name;
 
-	@Column(name = "location")
-	private String location;
+    @Column(name = "location")
+    private String             location;
 
-	@Column(name = "gallery")
-	@OneToMany(targetEntity = EventGallery.class, mappedBy = "event", fetch = FetchType.LAZY)
-	private List<EventGallery> gallery;
+    @Column(name = "gallery")
+    @OneToMany(targetEntity = EventGallery.class, mappedBy = "event", fetch = FetchType.LAZY)
+    private List<EventGallery> gallery;
 
-	@Column(name = "routes")
-	@OneToMany(targetEntity = EventRoute.class, mappedBy = "event", fetch = FetchType.LAZY)
-	private List<EventRoute> routes;
+    @Column(name = "routes")
+    @OneToMany(targetEntity = EventRoute.class, mappedBy = "event", fetch = FetchType.LAZY)
+    private List<EventRoute>   routes;
 
-	@Column(name = "country_code")
-	private String countryCode;
+    @Column(name = "country_code")
+    private String             countryCode;
 
-	@ManyToOne(targetEntity = EventType.class, fetch = FetchType.EAGER)
-	@JoinColumn(name = "event_type_id", referencedColumnName = "id")
-	private EventType eventType;
+    @ManyToOne(targetEntity = EventType.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_type_id", referencedColumnName = "id")
+    private EventType          eventType;
 
-	@Column(name = "description", length = 1000)
-	private String description;
+    @Column(name = "description", length = 1000)
+    private String             description;
 
-	@Column(name = "age_group")
-	private String ageGroup;
+    @Column(name = "age_group")
+    private String             ageGroup;
 
-	@Column(name = "start_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date startDate;
+    @Column(name = "start_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date               startDate;
 
-	@Column(name = "end_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date endDate;
+    @Column(name = "end_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date               endDate;
 
-	@Column(name = "number_of_participants")
-	private int numberOfParticipants;
+    @Column(name = "number_of_participants")
+    private int                numberOfParticipants;
 
-	@Column(name = "private", columnDefinition = "boolean default false")
-	private boolean isPrivate;
+    @Column(name = "private", columnDefinition = "boolean default false")
+    private boolean            isPrivate;
 
-	@Column(name = "voided", columnDefinition = "boolean default false")
-	private boolean voided;
+    @Column(name = "voided", columnDefinition = "boolean default false")
+    private boolean            voided;
 
-	@Column(name = "modified_Timestamp", nullable = false)
-	private Date modifiedTimestamp;
+    @Column(name = "modified_Timestamp", nullable = false)
+    private Date               modifiedTimestamp;
 
-	public Event() {
-		super();
-		this.id = UUID.randomUUID().toString();
-		this.modifiedTimestamp = this.createdTimestamp;
-	}
+    public Event() {
+        super();
+        this.id = UUID.randomUUID().toString();
+        this.modifiedTimestamp = this.createdTimestamp;
+    }
 
 }

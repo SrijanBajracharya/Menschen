@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.achiever.menschenfahren.constants.CommonConstants;
-import com.achiever.menschenfahren.entities.response.DataResponse;
-import com.achiever.menschenfahren.entities.response.EventCreateDto;
-import com.achiever.menschenfahren.entities.response.EventDto;
-import com.achiever.menschenfahren.entities.response.EventEditDto;
+import com.achiever.menschenfahren.base.constants.CommonConstants;
+import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.EventCreateDto;
+import com.achiever.menschenfahren.base.dto.EventDto;
+import com.achiever.menschenfahren.base.dto.EventEditDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 

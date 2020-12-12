@@ -13,9 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.achiever.menschenfahren.base.model.EventRole;
+import com.achiever.menschenfahren.base.model.EventStatus;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.models.EventRole;
-import com.achiever.menschenfahren.models.EventStatus;
 
 import lombok.Data;
 import lombok.ToString;
@@ -29,28 +29,28 @@ import lombok.ToString;
 @Table(name = "event_participants")
 public class EventParticipant {
 
-	@Id
-	@Nonnull
-	private String id;
+    @Id
+    @Nonnull
+    private String      id;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", referencedColumnName = "id")
-	private User user;
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User        user;
 
-	@ManyToOne(targetEntity = Event.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "event_id", referencedColumnName = "id")
-	private Event event;
+    @ManyToOne(targetEntity = Event.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
+    private Event       event;
 
-	@Column(name = "role")
-	@Enumerated(EnumType.STRING)
-	private EventRole role;
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private EventRole   role;
 
-	@Column(name = "status")
-	@Enumerated(EnumType.STRING)
-	private EventStatus status;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private EventStatus status;
 
-	public EventParticipant() {
-		this.id = UUID.randomUUID().toString();
-	}
+    public EventParticipant() {
+        this.id = UUID.randomUUID().toString();
+    }
 
 }

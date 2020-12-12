@@ -20,9 +20,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.achiever.menschenfahren.base.model.Gender;
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 import com.achiever.menschenfahren.entities.roles.Role;
-import com.achiever.menschenfahren.models.Gender;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

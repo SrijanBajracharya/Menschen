@@ -1,8 +1,8 @@
 package com.achiever.menschenfahren.mapper;
 
-import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
-import com.achiever.menschenfahren.entities.response.UserProfileDto;
-import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
+import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
+import com.achiever.menschenfahren.base.dto.UserProfileDto;
+import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 
 import ma.glasnost.orika.MapperFactory;

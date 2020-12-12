@@ -21,13 +21,13 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
+import com.achiever.menschenfahren.base.dto.EventCreateDto;
+import com.achiever.menschenfahren.base.dto.EventDto;
+import com.achiever.menschenfahren.base.dto.EventEditDto;
 import com.achiever.menschenfahren.controller.impl.EventRestController;
 import com.achiever.menschenfahren.dao.EventDaoInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
-import com.achiever.menschenfahren.entities.response.EventCreateDto;
-import com.achiever.menschenfahren.entities.response.EventDto;
-import com.achiever.menschenfahren.entities.response.EventEditDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.service.EventService;

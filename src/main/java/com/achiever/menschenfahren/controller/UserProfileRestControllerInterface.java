@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.achiever.menschenfahren.constants.CommonConstants;
-import com.achiever.menschenfahren.entities.response.DataResponse;
-import com.achiever.menschenfahren.entities.response.EventDto;
-import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
-import com.achiever.menschenfahren.entities.response.UserProfileDto;
-import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
+import com.achiever.menschenfahren.base.constants.CommonConstants;
+import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.EventDto;
+import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
+import com.achiever.menschenfahren.base.dto.UserProfileDto;
+import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 

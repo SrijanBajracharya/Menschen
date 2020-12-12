@@ -11,12 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
+import com.achiever.menschenfahren.base.dto.UserProfileDto;
+import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserProfileRestControllerInterface;
-import com.achiever.menschenfahren.entities.response.DataResponse;
-import com.achiever.menschenfahren.entities.response.UserProfileCreateDto;
-import com.achiever.menschenfahren.entities.response.UserProfileDto;
-import com.achiever.menschenfahren.entities.response.UserProfileEditDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidUserException;
@@ -37,6 +37,9 @@ public class UserProfileRestController extends BaseController implements UserPro
     @Autowired
     private UserService             userService;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull final String userId, @Nonnull @Valid final UserProfileCreateDto request,
             final boolean alsoVoided) throws InvalidUserException {
@@ -44,7 +47,7 @@ public class UserProfileRestController extends BaseController implements UserPro
         final Optional<User> user = this.userService.findByIdAndVoided(userId, alsoVoided);
         if (user.isPresent()) {
             final User savedUser = user.get();
-            request.setUserId(savedUser);
+            request.setUserId(userId);
             final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
             final UserProfile savedUserProfile = this.userProfileService.addProfile(userProfile, alsoVoided);
             final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
@@ -59,6 +62,9 @@ public class UserProfileRestController extends BaseController implements UserPro
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
         final UserProfile userProfile = this.findUserProfileById(id);
@@ -67,6 +73,9 @@ public class UserProfileRestController extends BaseController implements UserPro
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> editProfile(@Nonnull final String userProfileId, @Valid final UserProfileEditDto request)
             throws ResourceNotFoundException {
@@ -77,6 +86,15 @@ public class UserProfileRestController extends BaseController implements UserPro
         return buildResponse(userProfileMapper.map(savedUserProfile, UserProfileDto.class), HttpStatus.OK);
     }
 
+    /**
+     * Find User profile by the id.
+     *
+     * @param id
+     *            The identifier of user profile.
+     * @return User profile
+     * @throws ResourceNotFoundException
+     *             Thrown if the resource is not found.
+     */
     private UserProfile findUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
         final Optional<UserProfile> userProfileOptional = this.userProfileService.findById(id);
         if (userProfileOptional.isEmpty()) {

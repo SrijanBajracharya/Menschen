@@ -12,12 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.UserDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
-import com.achiever.menschenfahren.entities.response.DataResponse;
-import com.achiever.menschenfahren.entities.response.UserCreateDto;
-import com.achiever.menschenfahren.entities.response.UserDto;
 import com.achiever.menschenfahren.entities.users.User;
+import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.UserService;
 
@@ -44,7 +45,7 @@ public class UserRestController extends BaseController implements UserRestContro
      * Creates a new user.
      */
     @Override
-    public ResponseEntity<DataResponse<UserDto>> createUser(@Valid final UserCreateDto request, final boolean alsoVoided) {
+    public ResponseEntity<DataResponse<UserDto>> createUser(@Valid final UserCreateDto request, final boolean alsoVoided) throws InvalidUserException {
 
         final User user = userMapper.map(request, User.class);
         final User savedUser = userService.addUser(user);
@@ -63,7 +64,6 @@ public class UserRestController extends BaseController implements UserRestContro
      */
     @Override
     public ResponseEntity<DataResponse<List<UserDto>>> getUsers(final boolean alsoVoided) {
-        System.err.println("inside getUsers" + alsoVoided);
         final List<User> users = this.userService.getUsers(alsoVoided);
 
         final List<UserDto> allUsers = new ArrayList<>();
@@ -81,14 +81,11 @@ public class UserRestController extends BaseController implements UserRestContro
 
     @Override
     public ResponseEntity<DataResponse<UserDto>> getUser(final String userId, final boolean alsoVoided) {
-        System.err.println("inside getUser" + userId + "###" + alsoVoided);
         final Optional<User> userOptional = this.userService.findByIdAndVoided(userId, alsoVoided);
         if (!userOptional.isPresent()) {
-            System.err.println("not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             final User user = userOptional.get();
-            System.err.println(user + "####user");
             final UserDto userDto = this.userMapper.map(user, UserDto.class);
 
             if (userDto != null) {

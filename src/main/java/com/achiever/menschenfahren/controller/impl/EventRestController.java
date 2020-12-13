@@ -17,6 +17,7 @@ import com.achiever.menschenfahren.base.dto.DataResponse;
 import com.achiever.menschenfahren.base.dto.EventCreateDto;
 import com.achiever.menschenfahren.base.dto.EventDto;
 import com.achiever.menschenfahren.base.dto.EventEditDto;
+import com.achiever.menschenfahren.base.dto.UserEditDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.entities.events.Event;
@@ -24,6 +25,7 @@ import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.EventMapper;
+import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.UserService;
 
@@ -43,6 +45,8 @@ public class EventRestController extends BaseController implements EventRestCont
     private UserService       userService;
 
     private final EventMapper eventMapper = new EventMapper();
+
+    private final UserMapper  userMapper  = new UserMapper();
 
     public EventRestController() {
         super();
@@ -103,6 +107,11 @@ public class EventRestController extends BaseController implements EventRestCont
             final Event savedEvent = this.eventService.createEvent(event);
 
             final EventDto eventDto = this.eventMapper.map(savedEvent, EventDto.class);
+            if (eventDto != null) {
+                UserEditDto userEditDto = this.userMapper.map(foundUser, UserEditDto.class);
+                eventDto.setUserId(foundUser.getId());
+                eventDto.setUser(userEditDto);
+            }
             if (eventDto != null) {
                 return buildResponse(eventDto, HttpStatus.CREATED);
             } else {

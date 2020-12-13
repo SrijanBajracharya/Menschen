@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.UserDto;
 import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
 import com.achiever.menschenfahren.base.dto.UserProfileDto;
 import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
@@ -20,7 +21,9 @@ import com.achiever.menschenfahren.controller.UserProfileRestControllerInterface
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidUserException;
+import com.achiever.menschenfahren.exception.MultipleResourceFoundException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
+import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.mapper.UserProfileMapper;
 import com.achiever.menschenfahren.service.UserProfileService;
 import com.achiever.menschenfahren.service.UserService;
@@ -30,6 +33,8 @@ import com.achiever.menschenfahren.service.UserService;
 public class UserProfileRestController extends BaseController implements UserProfileRestControllerInterface {
 
     private final UserProfileMapper userProfileMapper = new UserProfileMapper();
+
+    private final UserMapper        userMapper        = new UserMapper();
 
     @Autowired
     private UserProfileService      userProfileService;
@@ -49,8 +54,17 @@ public class UserProfileRestController extends BaseController implements UserPro
             final User savedUser = user.get();
             request.setUserId(userId);
             final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
+            // setting user to userprofile.
+            userProfile.setUser(savedUser);
+
             final UserProfile savedUserProfile = this.userProfileService.addProfile(userProfile, alsoVoided);
             final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
+            if (userProfileDto != null) {
+                userProfileDto.setUserId(savedUser.getId());
+                UserDto userDto = this.userMapper.map(savedUser, UserDto.class);
+                userProfileDto.setUser(userDto);
+            }
+
             if (userProfileDto != null) {
                 return buildResponse(userProfileDto, HttpStatus.CREATED);
             } else {
@@ -70,6 +84,23 @@ public class UserProfileRestController extends BaseController implements UserPro
         final UserProfile userProfile = this.findUserProfileById(id);
         final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
         return buildResponse(savedUserProfileDto, HttpStatus.OK);
+
+    }
+
+    @Override
+    public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(@Nonnull final String userId, final boolean alsoVoided)
+            throws ResourceNotFoundException, MultipleResourceFoundException {
+        final Optional<User> user = this.userService.findByIdAndVoided(userId, alsoVoided);
+
+        if (user.isPresent()) {
+            User savedUser = user.get();
+            final UserProfile userProfile = this.findUserProfileByUser(savedUser);
+            final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
+            savedUserProfileDto.setUserId(savedUser.getId());
+            return buildResponse(savedUserProfileDto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
 
     }
 
@@ -102,6 +133,11 @@ public class UserProfileRestController extends BaseController implements UserPro
         }
         final UserProfile userProfile = userProfileOptional.get();
 
+        return userProfile;
+    }
+
+    private UserProfile findUserProfileByUser(@Nonnull final User user) throws ResourceNotFoundException, MultipleResourceFoundException {
+        final UserProfile userProfile = this.userProfileService.findByUser(user);
         return userProfile;
     }
 

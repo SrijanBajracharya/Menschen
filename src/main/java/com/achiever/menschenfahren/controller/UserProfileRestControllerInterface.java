@@ -19,6 +19,7 @@ import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
 import com.achiever.menschenfahren.base.dto.UserProfileDto;
 import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
 import com.achiever.menschenfahren.exception.InvalidUserException;
+import com.achiever.menschenfahren.exception.MultipleResourceFoundException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
 import io.swagger.oas.annotations.Operation;
@@ -97,4 +98,29 @@ public interface UserProfileRestControllerInterface {
     ResponseEntity<DataResponse<UserProfileDto>> editProfile(
             @PathVariable(name = CommonConstants.Params.USER_PROFILE_ID, required = true) @Nonnull final String userProfileId,
             @RequestBody(required = true) @Valid final UserProfileEditDto request) throws ResourceNotFoundException;
+
+    /**
+     * Find user profile by user id.
+     *
+     * @param userId
+     *            The id of an user.
+     * @param alsoVoided
+     *            The flag for voided.
+     * @return
+     * @throws ResourceNotFoundException
+     *             If the user profile cannot be found.
+     * @throws MultipleResourceFoundException
+     *             If multiple user profile is found.
+     */
+    @Operation(description = "Get User profile by user id.")
+    @Parameters(value = { @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user as part of the path.") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User profile found", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
+            @ApiResponse(responseCode = "300", description = "Multiple profile found for a user."),
+            @ApiResponse(responseCode = "404", description = "The user profile with the given user id doesn't exist", content = @Content()) })
+    @GetMapping("userProfile/{" + CommonConstants.Params.USER_ID + "}/{userId}")
+    ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(@PathVariable(name = "userId", required = true) @Nonnull final String userId,
+            @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
+            throws ResourceNotFoundException, MultipleResourceFoundException;
 }

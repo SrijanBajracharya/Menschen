@@ -15,66 +15,78 @@ import com.achiever.menschenfahren.service.EventService;
 @Service
 public class EventServiceImpl implements EventService {
 
-	@Autowired
-	private EventDaoInterface eventDao;
+    @Autowired
+    private EventDaoInterface eventDao;
 
-	/**
-	 * Returns all the events based on the filter.
-	 *
-	 * @param alsoVoided Filters voided events.
-	 * @return
-	 */
-	@Override
-	public List<Event> getEvents(final boolean alsoVoided, final boolean alsoPrivate) {
-		List<Event> events = eventDao.findByVoidedAndIsPrivate(alsoVoided, alsoPrivate);
-		return events;
-	}
+    /**
+     * Returns all the events based on the filter.
+     *
+     * @param alsoVoided
+     *            Filters voided events.
+     * @return
+     */
+    @Override
+    public List<Event> getEvents(final boolean alsoVoided, final boolean alsoPrivate) {
+        List<Event> events;
 
-	/**
-	 * Returns event based on event id.
-	 *
-	 * @param eventId The id of the event.
-	 * @return
-	 */
-	@Override
-	public Optional<Event> getEvent(@Nonnull final String eventId, final boolean alsoVoided,
-			final boolean alsoPrivate) {
-		return this.eventDao.findByIdAndVoidedAndIsPrivate(eventId, alsoVoided, alsoPrivate);
-		// return null;
-	}
+        if (alsoPrivate && alsoVoided) {
+            events = eventDao.findAll();
+        } else if (!alsoVoided && alsoPrivate) {
+            events = eventDao.findByVoided(alsoVoided);
+        } else {
+            events = eventDao.findByVoidedAndIsPrivate(alsoVoided, alsoPrivate);
+        }
+        return events;
+    }
 
-	/**
-	 * Create new Event.
-	 *
-	 * @param event The new event to create.
-	 * @return
-	 */
-	@Override
-	public Event createEvent(@Nonnull final Event event) {
-		return this.eventDao.save(event);
-	}
+    /**
+     * Returns event based on event id.
+     *
+     * @param eventId
+     *            The id of the event.
+     * @return
+     */
+    @Override
+    public Optional<Event> getEvent(@Nonnull final String eventId, final boolean alsoVoided, final boolean alsoPrivate) {
+        return this.eventDao.findByIdAndVoidedAndIsPrivate(eventId, alsoVoided, alsoPrivate);
+        // return null;
+    }
 
-	/**
-	 * Find events based on userId and voided parameter.
-	 *
-	 * @param userId     The identifier of an user.
-	 * @param alsoVoided The identifier to check if the event is voided or not.
-	 * @return {@link List} of {@link Event}
-	 */
-	@Override
-	public List<Event> getEventsByUserId(@Nonnull final String userId, final boolean alsoVoided) {
-		final List<Event> events = eventDao.findByUserIdAndVoided(userId, alsoVoided);
-		return events;
-	}
+    /**
+     * Create new Event.
+     *
+     * @param event
+     *            The new event to create.
+     * @return
+     */
+    @Override
+    public Event createEvent(@Nonnull final Event event) {
+        return this.eventDao.save(event);
+    }
 
-	@Override
-	public Optional<Event> findById(@Nonnull final String id) {
-		return this.eventDao.findById(id);
-	}
+    /**
+     * Find events based on userId and voided parameter.
+     *
+     * @param userId
+     *            The identifier of an user.
+     * @param alsoVoided
+     *            The identifier to check if the event is voided or not.
+     * @return {@link List} of {@link Event}
+     */
+    @Override
+    public List<Event> getEventsByUserId(@Nonnull final String userId, final boolean alsoVoided) {
+        final List<Event> events = eventDao.findByUserIdAndVoided(userId, alsoVoided);
+        return events;
+    }
 
-	@Override
-	public Event merge(@Nonnull final Event event) {
-		return this.eventDao.save(event);
-	}
+    @Override
+    public Optional<Event> findById(@Nonnull final String id) {
+        return this.eventDao.findById(id);
+    }
+
+    @Override
+    public Event merge(@Nonnull final Event event) {
+        return this.eventDao.save(event);
+    }
 
 }

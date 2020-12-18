@@ -59,7 +59,6 @@ public class UserServiceImpl implements UserService {
         final User usernameExists = userDao.findByUsername(user.getUsername());
         User savedUser = null;
         if (userExists == null && usernameExists == null) {
-
             savedUser = userDao.save(user);
         } else {
             throw new InvalidUserException("Email and/or username must be unique.");

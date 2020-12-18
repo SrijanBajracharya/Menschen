@@ -44,7 +44,8 @@ public class UserRestController extends BaseController implements UserRestContro
 
     private final UserMapper            userMapper;
 
-    private final UserService           userService;
+    @Autowired
+    private UserService                 userService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -59,7 +60,6 @@ public class UserRestController extends BaseController implements UserRestContro
         super();
         this.userMapper = new UserMapper();
         this.authenticationManager = authenticationManager;
-        this.userService = userService;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 

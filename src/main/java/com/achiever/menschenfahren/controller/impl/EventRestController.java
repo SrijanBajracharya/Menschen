@@ -23,6 +23,7 @@ import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
+import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.mapper.UserMapper;
@@ -62,6 +63,8 @@ public class EventRestController extends BaseController implements EventRestCont
         final List<EventDto> eventDtoList = new ArrayList<>();
         for (final Event event : events) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
+            // Setting the id of the user in the eventDto.
+            eventDto.setUserId(event.getUser().getId());
             eventDtoList.add(eventDto);
         }
 
@@ -176,10 +179,18 @@ public class EventRestController extends BaseController implements EventRestCont
 
     /**
      * Update event based on the eventId and provided set of updated values.
+     *
+     * @throws InvalidUserException
      */
     @Override
-    public ResponseEntity<DataResponse<EventDto>> editEvent(@Nonnull final String eventId, @Valid final EventEditDto request) throws ResourceNotFoundException {
+    public ResponseEntity<DataResponse<EventDto>> editEvent(@Nonnull final String eventId, @Valid final EventEditDto request)
+            throws ResourceNotFoundException, InvalidUserException {
         final Event event = getEventById(eventId);
+
+        if (!event.getUser().getId().equals(request.getUserId())) {
+            throw new InvalidUserException("You are not allowed to edit the event.");
+        }
+
         eventMapper.map(request, event);
 
         final Event savedEvent = eventService.createEvent(event);

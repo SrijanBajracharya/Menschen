@@ -21,6 +21,7 @@ import com.achiever.menschenfahren.base.dto.EventCreateDto;
 import com.achiever.menschenfahren.base.dto.EventDto;
 import com.achiever.menschenfahren.base.dto.EventEditDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
+import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
 import io.swagger.oas.annotations.Operation;
@@ -163,6 +164,7 @@ public interface EventRestControllerInterface {
      * @return The updated event or an error code.
      * @throws ResourceNotFoundException
      *             If the referenced Id wasn't found. Will be returned as code 404.
+     * @throws InvalidUserException
      */
     @Operation(description = "Updates an exisiting Event.")
     @Parameters(value = { @Parameter(name = "request", description = "The fields as request body that can be changed during a basic edit operation"),
@@ -174,6 +176,6 @@ public interface EventRestControllerInterface {
             @ApiResponse(responseCode = "404", description = "The event with the given id doesn't exist", content = @Content()) })
     @PatchMapping("events/{" + CommonConstants.Params.EVENT_ID + "}/edit")
     ResponseEntity<DataResponse<EventDto>> editEvent(@PathVariable(name = CommonConstants.Params.EVENT_ID, required = true) @Nonnull final String eventId,
-            @RequestBody(required = true) @Valid final EventEditDto request) throws ResourceNotFoundException;
+            @RequestBody(required = true) @Valid final EventEditDto request) throws ResourceNotFoundException, InvalidUserException;
 
 }

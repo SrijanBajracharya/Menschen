@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
 import com.achiever.menschenfahren.base.dto.UserCreateDto;
@@ -45,15 +46,13 @@ public class UserRestControllerTest {
 
     private static final String       userId        = "userId";
     private static final String       voidedId      = "voidedId";
+    private static final String       password      = "password";
 
     @MockBean
     private UserDaoInterface          userDao;
 
     @InjectMocks
     private UserRestController        restController;
-
-    @SpyBean
-    private UserService               userService;
 
     private static final String       userProfileId = "userProfileId";
 
@@ -65,6 +64,12 @@ public class UserRestControllerTest {
 
     @SpyBean
     private UserProfileService        userProfileService;
+
+    @SpyBean
+    private UserService               userService;
+
+    @MockBean
+    private PasswordEncoder           bcryptEncoder;
 
     @BeforeAll
     protected static void initialize() {
@@ -79,10 +84,12 @@ public class UserRestControllerTest {
         final User user = buildUser();
         user.setVoided(false);
         user.setId(userId);
+        user.setPassword(password);
 
         final User voidedUser = buildUser();
         voidedUser.setVoided(true);
         voidedUser.setId(voidedId);
+        voidedUser.setPassword(password);
 
         final List<User> allUsers = new ArrayList<>();
         allUsers.add(user);
@@ -101,6 +108,11 @@ public class UserRestControllerTest {
 
         Mockito.doReturn(Optional.of(user)).when(userDao).findById(Mockito.eq(userId));
         Mockito.doReturn(Optional.of(voidedUser)).when(userDao).findById(Mockito.eq(voidedId));
+
+        Mockito.doReturn(password).when(bcryptEncoder).encode(Mockito.any(String.class));
+
+        Mockito.doReturn(null).when(userDao).findByEmail(Mockito.any(String.class));
+        Mockito.doReturn(null).when(userDao).findByUsername(Mockito.any(String.class));
 
         final UserProfile userProfile = buildUserProfile();
         userProfile.setUser(user);
@@ -127,6 +139,7 @@ public class UserRestControllerTest {
 
         Mockito.doReturn(Optional.of(userProfile)).when(userProfileDto).findById(Mockito.eq(userProfileId));
         Mockito.doReturn(Optional.of(voidedUserProfile)).when(userProfileDto).findById(Mockito.eq(voidedId));
+
     }
 
     private User buildUser() {

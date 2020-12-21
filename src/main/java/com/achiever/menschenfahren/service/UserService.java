@@ -48,6 +48,20 @@ public interface UserService {
      */
     User changePassword(@NonNull final String uuid, @NonNull final String password);
 
+    /**
+     * Find user by id.
+     * 
+     * @param uuid
+     * @return
+     */
     Optional<User> findById(@Nonnull final String uuid);
+
+    /**
+     * Find user by email.
+     * 
+     * @param email
+     * @return
+     */
+    User findByEmail(@Nonnull final String email);
 
 }

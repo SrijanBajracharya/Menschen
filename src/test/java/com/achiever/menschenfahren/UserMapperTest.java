@@ -17,6 +17,7 @@ public class UserMapperTest {
         dto.setLastName("abc");
         dto.setEmail("abc@gmail.com");
         dto.setPassword("abc");
+        dto.setUsername("abc");
         final User user = mapper.map(dto, User.class);
         final UserDto userDto = mapper.map(user, UserDto.class);
     }

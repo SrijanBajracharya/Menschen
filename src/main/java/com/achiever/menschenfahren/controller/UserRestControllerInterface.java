@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
 import com.achiever.menschenfahren.base.dto.DataResponse;
+import com.achiever.menschenfahren.base.dto.JwtRequest;
 import com.achiever.menschenfahren.base.dto.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.UserDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
@@ -97,5 +98,20 @@ public interface UserRestControllerInterface {
     ResponseEntity<DataResponse<UserDto>> getUser(@PathVariable(name = "userId", required = true) @Nonnull final String userId,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws InvalidUserException;
+
+    /**
+     * Returns the token if the credentials are correct.
+     * 
+     * @param authenticationRequest
+     * @return
+     * @throws Exception
+     */
+    @Operation(description = "Returns the authentication token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Credentials matches", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
+            @ApiResponse(responseCode = "401", description = "Credential not matched. Unauthorized") })
+    @PostMapping(value = "authenticate")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception;
 
 }

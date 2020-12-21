@@ -56,8 +56,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User addUser(@NonNull final User user) throws InvalidUserException {
         final User userExists = userDao.findByEmail(user.getEmail());
+        final User usernameExists = userDao.findByUsername(user.getUsername());
         User savedUser = null;
-        if (userExists == null) {
+        if (userExists == null && usernameExists == null) {
             savedUser = userDao.save(user);
         } else {
             throw new InvalidUserException("Email and/or username must be unique.");
@@ -99,6 +100,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findById(final String uuid) {
         return userDao.findById(uuid);
+    }
+
+    @Override
+    public User findByEmail(@Nonnull final String email) {
+        return userDao.findByEmail(email);
     }
 
 }

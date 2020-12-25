@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.EventTypeCreateDto;
-import com.achiever.menschenfahren.base.dto.EventTypeDto;
+import com.achiever.menschenfahren.base.dto.request.EventTypeCreateDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventTypeDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 

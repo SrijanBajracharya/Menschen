@@ -1,8 +1,8 @@
 package com.achiever.menschenfahren.mapper;
 
-import com.achiever.menschenfahren.base.dto.EventCreateDto;
-import com.achiever.menschenfahren.base.dto.EventDto;
-import com.achiever.menschenfahren.base.dto.EventEditDto;
+import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
+import com.achiever.menschenfahren.base.dto.request.EventEditDto;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.entities.events.Event;
 
 import ma.glasnost.orika.MapperFactory;

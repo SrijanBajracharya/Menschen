@@ -21,10 +21,10 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
-import com.achiever.menschenfahren.base.dto.UserCreateDto;
-import com.achiever.menschenfahren.base.dto.UserEditDto;
-import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
-import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
+import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.request.UserEditDto;
+import com.achiever.menschenfahren.base.dto.request.UserProfileCreateDto;
+import com.achiever.menschenfahren.base.dto.request.UserProfileEditDto;
 import com.achiever.menschenfahren.controller.impl.UserProfileRestController;
 import com.achiever.menschenfahren.controller.impl.UserRestController;
 import com.achiever.menschenfahren.dao.UserDaoInterface;

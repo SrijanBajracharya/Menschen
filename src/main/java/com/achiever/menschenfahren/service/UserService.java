@@ -10,8 +10,20 @@ import org.springframework.lang.NonNull;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 
+/**
+ * Interface handling all functionality for user service.
+ *
+ * @author Srijan Bajracharya
+ *
+ */
 public interface UserService {
 
+    /**
+     * Returns all users based on also voided.
+     * 
+     * @param alsoVoided
+     * @return
+     */
     List<User> getUsers(final boolean alsoVoided);
 
     /**
@@ -48,6 +60,13 @@ public interface UserService {
      */
     User changePassword(@NonNull final String uuid, @NonNull final String password);
 
+    /**
+     * Finds user by id.
+     *
+     * @param uuid
+     *            The id of user.
+     * @return The optional user by id.
+     */
     Optional<User> findById(@Nonnull final String uuid);
 
 }

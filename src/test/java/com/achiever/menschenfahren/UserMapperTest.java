@@ -2,8 +2,8 @@ package com.achiever.menschenfahren;
 
 import org.junit.jupiter.api.Test;
 
-import com.achiever.menschenfahren.base.dto.UserCreateDto;
-import com.achiever.menschenfahren.base.dto.UserDto;
+import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.mapper.UserMapper;
 

@@ -13,11 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.EventCreateDto;
-import com.achiever.menschenfahren.base.dto.EventDto;
-import com.achiever.menschenfahren.base.dto.EventEditDto;
-import com.achiever.menschenfahren.base.dto.UserEditDto;
+import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
+import com.achiever.menschenfahren.base.dto.request.EventEditDto;
+import com.achiever.menschenfahren.base.dto.request.UserEditDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.entities.events.Event;

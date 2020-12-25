@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.EventDto;
-import com.achiever.menschenfahren.base.dto.UserProfileCreateDto;
-import com.achiever.menschenfahren.base.dto.UserProfileDto;
-import com.achiever.menschenfahren.base.dto.UserProfileEditDto;
+import com.achiever.menschenfahren.base.dto.request.UserProfileCreateDto;
+import com.achiever.menschenfahren.base.dto.request.UserProfileEditDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
+import com.achiever.menschenfahren.base.dto.response.UserProfileDto;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.MultipleResourceFoundException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;

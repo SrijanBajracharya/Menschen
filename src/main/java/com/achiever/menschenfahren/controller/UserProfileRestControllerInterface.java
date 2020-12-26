@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
 import com.achiever.menschenfahren.base.dto.request.UserProfileCreateDto;
@@ -123,4 +124,38 @@ public interface UserProfileRestControllerInterface {
     ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(@PathVariable(name = "userId", required = true) @Nonnull final String userId,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws ResourceNotFoundException, MultipleResourceFoundException;
+
+    /**
+     * Update a new avatar.
+     *
+     * @param avatar
+     *            The picture to update.
+     * @param userId
+     *            The id of the user.
+     * @return
+     */
+    @Operation(description = "Upload a new avatar")
+    @Parameters(value = { @Parameter(name = CommonConstants.Params.AVATAR, description = "The avatar file. Only image files are supported."),
+            @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user.") })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Avatar was set.", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "Token is invalid.", content = @Content()) })
+    @Nonnull
+    @PostMapping(CommonConstants.Params.USER_PROFILE_ID + "/" + CommonConstants.Params.AVATAR + "/{" + CommonConstants.Params.USER_ID + "}")
+    ResponseEntity<String> updateUserPicture(@RequestParam(name = CommonConstants.Params.AVATAR) @Nonnull MultipartFile avatar,
+            @PathVariable(name = "userId", required = true) @Nonnull final String userId);
+
+    /**
+     * Returns the avatar for given user.
+     * 
+     * @param userId
+     *            The id of user.
+     * @return The avatar.Body can be null.
+     */
+    @Operation(description = "Get the avatar for the given user.")
+    @Parameters(value = { @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of user.", required = true) })
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "The avatar found.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "No avatar found.", content = @Content()) })
+    @GetMapping(CommonConstants.Params.AVATAR + "/{" + CommonConstants.Params.USER_ID + "}")
+    @Nonnull
+    ResponseEntity<byte[]> getAvatar(@PathVariable(name = CommonConstants.Params.USER_ID) @Nonnull final String userId);
 }

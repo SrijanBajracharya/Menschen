@@ -1,15 +1,20 @@
 package com.achiever.menschenfahren.controller.impl;
 
+import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.achiever.menschenfahren.base.dto.request.UserProfileCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserProfileEditDto;
@@ -18,6 +23,8 @@ import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.base.dto.response.UserProfileDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserProfileRestControllerInterface;
+import com.achiever.menschenfahren.dao.AvatarDaoInterface;
+import com.achiever.menschenfahren.entities.users.Avatar;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.exception.InvalidUserException;
@@ -28,19 +35,27 @@ import com.achiever.menschenfahren.mapper.UserProfileMapper;
 import com.achiever.menschenfahren.service.UserProfileService;
 import com.achiever.menschenfahren.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping(Constants.SERVICE_EVENT_API)
+@Slf4j
 public class UserProfileRestController extends BaseController implements UserProfileRestControllerInterface {
 
-    private final UserProfileMapper userProfileMapper = new UserProfileMapper();
+    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE);
 
-    private final UserMapper        userMapper        = new UserMapper();
+    private final UserProfileMapper  userProfileMapper     = new UserProfileMapper();
+
+    private final UserMapper         userMapper            = new UserMapper();
 
     @Autowired
-    private UserProfileService      userProfileService;
+    private UserProfileService       userProfileService;
 
     @Autowired
-    private UserService             userService;
+    private AvatarDaoInterface       avatarDao;
+
+    @Autowired
+    private UserService              userService;
 
     /**
      * {@inheritDoc}
@@ -139,6 +154,55 @@ public class UserProfileRestController extends BaseController implements UserPro
     private UserProfile findUserProfileByUser(@Nonnull final User user) throws ResourceNotFoundException, MultipleResourceFoundException {
         final UserProfile userProfile = this.userProfileService.findByUser(user);
         return userProfile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<String> updateUserPicture(@Nonnull final MultipartFile avatar, @Nonnull final String userId) {
+        final var contentType = avatar.getContentType();
+        if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
+            return ResponseEntity.badRequest().body("Invalid image type. Only allowed: " + ALLOWED_CONTENT_TYPES);
+        }
+
+        try {
+            final var avatarBytes = avatar.getBytes();
+            final var avatarData = new Avatar();
+            avatarData.setAvatar(avatarBytes);
+            avatarData.setAvatarType(contentType);
+            avatarData.setUserId(userId);
+
+            this.avatarDao.save(avatarData);
+            log.info("Updated avatar for account {}.", userId);
+
+        } catch (final IOException e) {
+            return ResponseEntity.badRequest().body("Could not update avatar: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Updated your avatar.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<byte[]> getAvatar(@Nonnull final String userId) {
+        final Optional<Avatar> avatar = this.avatarDao.findByUserId(userId);
+        if (avatar.isPresent() && null != avatar.get().getAvatar()) {
+            final var mediaType = avatar.get().getAvatarType();
+            MediaType responseMediaType;
+            try {
+                responseMediaType = MediaType.valueOf(mediaType);
+            } catch (final InvalidMediaTypeException e) {
+                log.warn("Invalid media type.{}", mediaType);
+                responseMediaType = MediaType.APPLICATION_OCTET_STREAM;
+            }
+
+            return ResponseEntity.ok().contentType(responseMediaType).body(avatar.get().getAvatar());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

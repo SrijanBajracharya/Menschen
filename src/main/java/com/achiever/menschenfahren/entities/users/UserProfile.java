@@ -46,6 +46,10 @@ public class UserProfile extends AbstractBaseEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User       user;
 
+    @OneToOne(targetEntity = Avatar.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "avatar_id", referencedColumnName = "user_id")
+    private Avatar     avatar;
+
     @OneToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private List<Role> roleId;

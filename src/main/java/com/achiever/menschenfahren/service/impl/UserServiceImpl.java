@@ -20,8 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private final UserDaoInterface userDao;
+
     @Autowired
-    private UserDaoInterface userDao;
+    public UserServiceImpl(@Nonnull final UserDaoInterface userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
     public List<User> getUsers(final boolean alsoVoided) {

@@ -7,11 +7,13 @@ import com.achiever.menschenfahren.base.model.NotificationStatus;
 import com.achiever.menschenfahren.base.model.NotificationType;
 import com.achiever.menschenfahren.entities.notification.Notification;
 
+import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.Mapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.ConfigurableMapper;
+import ma.glasnost.orika.metadata.Type;
 
 public class NotificationMapper extends ConfigurableMapper {
 
@@ -35,6 +37,18 @@ public class NotificationMapper extends ConfigurableMapper {
             }
 
         }).register();
+    }
+
+    public class CustomEnumConverter extends CustomConverter<String, Enum> {
+
+        @Override
+        public Enum convert(String source, Type<? extends Enum> destinationType, MappingContext mappingContext) {
+            try {
+                return Enum.valueOf(destinationType.getRawType(), source);
+            } catch (IllegalArgumentException ignored) {
+                return null;
+            }
+        }
     }
 
     private final Mapper<Notification, NotificationDto> getNotificationMapper() {

@@ -45,6 +45,7 @@ public class UserRestControllerTest {
 
     private static final String       userId        = "userId";
     private static final String       voidedId      = "voidedId";
+    private static final String       userProfileId = "userProfileId";
 
     @MockBean
     private UserDaoInterface          userDao;
@@ -54,8 +55,6 @@ public class UserRestControllerTest {
 
     @SpyBean
     private UserService               userService;
-
-    private static final String       userProfileId = "userProfileId";
 
     @MockBean
     private UserProfileDaoInterface   userProfileDto;

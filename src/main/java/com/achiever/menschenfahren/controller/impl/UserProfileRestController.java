@@ -1,6 +1,7 @@
 package com.achiever.menschenfahren.controller.impl;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -167,14 +168,26 @@ public class UserProfileRestController extends BaseController implements UserPro
         }
 
         try {
-            final var avatarBytes = avatar.getBytes();
-            final var avatarData = new Avatar();
-            avatarData.setAvatar(avatarBytes);
-            avatarData.setAvatarType(contentType);
-            avatarData.setUserId(userId);
 
-            this.avatarDao.save(avatarData);
-            log.info("Updated avatar for account {}.", userId);
+            final Optional<Avatar> savedAvatarOptional = this.avatarDao.findByUserId(userId);
+
+            if (savedAvatarOptional.isPresent() && null != savedAvatarOptional.get().getAvatar()) {
+                Avatar savedAvatar = savedAvatarOptional.get();
+                savedAvatar.setAvatar(avatar.getBytes());
+                savedAvatar.setAvatarType(contentType);
+                savedAvatar.setModifiedTimestamp(new Date());
+                this.avatarDao.save(savedAvatar);
+                log.info("Updated avatar for account {}.", userId);
+            } else {
+                final var avatarBytes = avatar.getBytes();
+                final var avatarData = new Avatar();
+                avatarData.setAvatar(avatarBytes);
+                avatarData.setAvatarType(contentType);
+                avatarData.setUserId(userId);
+
+                this.avatarDao.save(avatarData);
+                log.info("Saved avatar for account {}.", userId);
+            }
 
         } catch (final IOException e) {
             return ResponseEntity.badRequest().body("Could not update avatar: " + e.getMessage());

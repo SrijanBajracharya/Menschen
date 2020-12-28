@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.achiever.menschenfahren.base.constants.CommonConstants;
 import com.achiever.menschenfahren.base.dto.request.NotificationCreateDto;
 import com.achiever.menschenfahren.base.dto.request.NotificationEditDto;
+import com.achiever.menschenfahren.base.dto.request.NotificationInviteDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.NotificationDto;
-import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.exception.InvalidNotificationException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
@@ -31,10 +31,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+/**
+ * The interface for handling all functionality related to notification.
+ *
+ * @author Srijan Bajracharya
+ *
+ */
 public interface NotificationRestControllerInterface {
 
     /**
-     * Creates a new Notification.
+     * Creates a new request to join Notification.
      *
      * @param request
      *            The object to create a new Notification.
@@ -47,9 +53,30 @@ public interface NotificationRestControllerInterface {
             @ApiResponse(responseCode = "201", description = "Notification was successfully created", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NotificationDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Returned if the Notification data contained invalid field") })
-    @PostMapping("notification")
-    ResponseEntity<DataResponse<NotificationDto>> createNotification(@RequestBody(required = true) @Valid final NotificationCreateDto request,
+    @PostMapping("notification/join")
+    ResponseEntity<DataResponse<NotificationDto>> createJoinRequest(@RequestBody(required = true) @Valid final NotificationCreateDto request,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
+            throws InvalidNotificationException;
+
+    /**
+     * Creates a new invite notification.
+     *
+     * @param request
+     *            The object to create a new notification.
+     * @return Created notification.
+     * @throws InvalidNotificationException
+     *             Thrown if the notification request is invalid.
+     */
+    @Operation(description = "Creates a new Notification.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Notification was successfully created", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NotificationDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Returned if the Notification data contained invalid field"),
+            @ApiResponse(responseCode = "204", description = "Returned if the Notification couldn't be saved."),
+            @ApiResponse(responseCode = "208", description = "Returned if the Notification has already been sent."),
+            @ApiResponse(responseCode = "404", description = "Returned if the receiver email id is not found in the system.") })
+    @PostMapping("notification/invite")
+    ResponseEntity<DataResponse<NotificationDto>> createInviteRequest(@RequestBody(required = true) @Valid final NotificationInviteDto request)
             throws InvalidNotificationException;
 
     /***
@@ -100,7 +127,7 @@ public interface NotificationRestControllerInterface {
     @Operation(description = "Return All Notifications.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found Notifications", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NotificationDto.class)) }),
             @ApiResponse(responseCode = "204", description = "Found no visible Notification", content = @Content()),
             @ApiResponse(responseCode = "400", description = "The notification data is incomplete"),
             @ApiResponse(responseCode = "410", description = "The notification has been voided") })

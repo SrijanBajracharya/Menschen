@@ -20,7 +20,7 @@ public interface UserService {
 
     /**
      * Returns all users based on also voided.
-     * 
+     *
      * @param alsoVoided
      * @return
      */
@@ -68,5 +68,14 @@ public interface UserService {
      * @return The optional user by id.
      */
     Optional<User> findById(@Nonnull final String uuid);
+
+    /**
+     * Finds user by email.
+     *
+     * @param emailId
+     *            The id of email.
+     * @return The optional User.
+     */
+    User findByEmail(@Nonnull final String emailId);
 
 }

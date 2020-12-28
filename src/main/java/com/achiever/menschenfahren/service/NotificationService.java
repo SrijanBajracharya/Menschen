@@ -55,4 +55,6 @@ public interface NotificationService {
      */
     List<Notification> findByOriginalReceiverId(@Nonnull final String originalReceiverId, final boolean alsoVoided);
 
+    Notification findByOriginalSenderIdAndOriginalReceiverIdAndEventId(@Nonnull final String originalSenderId, @Nonnull final String originalReceiverId,
+            @Nonnull final String eventId);
 }

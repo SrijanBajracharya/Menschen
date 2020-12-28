@@ -2,7 +2,9 @@ package com.achiever.menschenfahren.mapper;
 
 import com.achiever.menschenfahren.base.dto.request.NotificationCreateDto;
 import com.achiever.menschenfahren.base.dto.request.NotificationEditDto;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.base.dto.response.NotificationDto;
+import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.base.model.NotificationStatus;
 import com.achiever.menschenfahren.base.model.NotificationType;
 import com.achiever.menschenfahren.entities.notification.Notification;
@@ -16,6 +18,10 @@ import ma.glasnost.orika.impl.ConfigurableMapper;
 import ma.glasnost.orika.metadata.Type;
 
 public class NotificationMapper extends ConfigurableMapper {
+
+    private UserMapper  userMapper  = new UserMapper();
+
+    private EventMapper eventMapper = new EventMapper();
 
     @Override
     public void configure(final MapperFactory factory) {
@@ -88,24 +94,15 @@ public class NotificationMapper extends ConfigurableMapper {
     public NotificationDto convertNotificationToNotificationDto(final Notification notification) {
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setAlsoVoided(notification.isVoided());
-        notificationDto.setEventId(notification.getEventId());
-        notificationDto.setOriginalReceiverId(notification.getOriginalReceiverId());
-        notificationDto.setOriginalSenderId(notification.getOriginalSenderId());
+        notificationDto.setEvent(this.eventMapper.map(notification.getEvent(), EventDto.class));
+
+        notificationDto.setReceiverUser(this.userMapper.map(notification.getOriginalReceiver(), UserDto.class));
+        notificationDto.setSenderUser(this.userMapper.map(notification.getOriginalSender(), UserDto.class));
         notificationDto.setNotificationStatus(notification.getNotificationStatus().getValue());
         notificationDto.setNotificationType(notification.getNotificationType().getValue());
         notificationDto.setId(notification.getId());
+        notificationDto.setModifiedTimestamp(notification.getModifiedTimestamp());
         return notificationDto;
-    }
-
-    public Notification convertNotificationCreateDtoToNotification(final NotificationCreateDto notificationCreateDto) {
-        Notification notification = new Notification();
-        notification.setVoided(notificationCreateDto.isAlsoVoided());
-        notification.setEventId(notificationCreateDto.getEventId());
-        notification.setOriginalReceiverId(notificationCreateDto.getOriginalReceiverId());
-        notification.setOriginalSenderId(notificationCreateDto.getOriginalSenderId());
-        notification.setNotificationType(NotificationType.fromString(notificationCreateDto.getNotificationType()));
-        notification.setNotificationStatus(NotificationStatus.getByName(notificationCreateDto.getNotificationStatus()));
-        return notification;
     }
 
 }

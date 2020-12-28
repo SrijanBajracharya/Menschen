@@ -38,7 +38,7 @@ public interface NotificationDaoInterface extends JpaRepository<Notification, St
 
     /**
      * Finds notification based on receiver id and voided.
-     * 
+     *
      * @param originalReceiverId
      *            The id of original receiver.
      * @param voided
@@ -49,7 +49,7 @@ public interface NotificationDaoInterface extends JpaRepository<Notification, St
 
     /**
      * Finds notification based on sender id and voided.
-     * 
+     *
      * @param originalSenderId
      *            The id of original sender.
      * @param voided
@@ -58,4 +58,6 @@ public interface NotificationDaoInterface extends JpaRepository<Notification, St
      */
     List<Notification> findByOriginalSenderIdAndVoided(@Nonnull final String originalSenderId, final boolean voided);
 
+    Notification findByOriginalSenderIdAndOriginalReceiverIdAndEventId(@Nonnull final String originalSenderId, @Nonnull final String originalReceiverId,
+            @Nonnull final String eventId);
 }

@@ -35,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
      * {@inheritDoc}
      */
     @Override
-    public Notification createNotification(Notification notification) {
+    public Notification createNotification(@Nonnull final Notification notification) {
         return notificationDao.save(notification);
     }
 
@@ -72,6 +72,12 @@ public class NotificationServiceImpl implements NotificationService {
         } else {
             return notificationDao.findByOriginalReceiverIdAndVoided(originalReceiverId, alsoVoided);
         }
+    }
+
+    @Override
+    public Notification findByOriginalSenderIdAndOriginalReceiverIdAndEventId(@Nonnull final String originalSenderId, @Nonnull final String originalReceiverId,
+            @Nonnull final String eventId) {
+        return notificationDao.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(originalSenderId, originalReceiverId, eventId);
     }
 
 }

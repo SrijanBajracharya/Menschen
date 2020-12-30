@@ -92,7 +92,7 @@ public interface UserProfileRestControllerInterface {
             @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user as part of the path.") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User profile was successfully edited", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserProfileDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The given user wasn't valid for an update operation."),
             @ApiResponse(responseCode = "404", description = "The user with the given id doesn't exist", content = @Content()) })
     @PatchMapping("userProfile/{" + CommonConstants.Params.USER_PROFILE_ID + "}/edit")
@@ -146,7 +146,7 @@ public interface UserProfileRestControllerInterface {
 
     /**
      * Returns the avatar for given user.
-     * 
+     *
      * @param userId
      *            The id of user.
      * @return The avatar.Body can be null.

@@ -44,6 +44,8 @@ public interface UserService {
      */
     User addUser(@NonNull final User user) throws InvalidUserException;
 
+    User updateUser(@Nonnull final User user);
+
     /**
      * De-activates user.
      *

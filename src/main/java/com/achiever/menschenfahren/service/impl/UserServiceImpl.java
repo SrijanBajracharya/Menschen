@@ -69,6 +69,11 @@ public class UserServiceImpl implements UserService {
         return savedUser;
     }
 
+    @Override
+    public User updateUser(@Nonnull final User user) {
+        return userDao.save(user);
+    }
+
     /**
      * De-activates user.
      *

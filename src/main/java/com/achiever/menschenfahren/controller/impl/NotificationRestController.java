@@ -77,6 +77,14 @@ public class NotificationRestController extends BaseController implements Notifi
             throw new InvalidNotificationException("The id of sender, receiver and event should be filled.");
         }
 
+        Notification existedNotification = this.notificationService.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(request.getOriginalSenderId(),
+                request.getOriginalReceiverId(), request.getEventId());
+
+        if (existedNotification != null && request.getNotificationType().equalsIgnoreCase(existedNotification.getNotificationType().getValue())) {
+            log.info("The request has already been sent to the user.");
+            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
+        }
+
         final Notification notification = createJoinNotification(request, alsoVoided);
 
         Notification savedNotification = this.notificationService.createNotification(notification);
@@ -176,7 +184,7 @@ public class NotificationRestController extends BaseController implements Notifi
         Notification existedNotification = this.notificationService.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(request.getOriginalSenderId(),
                 user.getId(), request.getEventId());
 
-        if (existedNotification != null) {
+        if (existedNotification != null && existedNotification.getNotificationType().equals(NotificationType.INVITE)) {
             log.info("The request has already been sent to the user.");
             return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
         } else {

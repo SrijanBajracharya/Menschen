@@ -85,6 +85,7 @@ public class EventRestController extends BaseController implements EventRestCont
             final Event event = eventOptional.get();
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             if (eventDto != null) {
+                eventDto.setUserId(event.getUser().getId());
                 return buildResponse(eventDto, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.GONE);
@@ -170,7 +171,9 @@ public class EventRestController extends BaseController implements EventRestCont
 
         event.setPrivate(false);
         final Event savedEvent = this.eventService.merge(event);
-        return buildResponse(eventMapper.map(savedEvent, EventDto.class), HttpStatus.OK);
+        EventDto eventDto = eventMapper.map(savedEvent, EventDto.class);
+        eventDto.setUserId(savedEvent.getUser().getId());
+        return buildResponse(eventDto, HttpStatus.OK);
 
     }
 

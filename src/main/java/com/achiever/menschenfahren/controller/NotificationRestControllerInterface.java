@@ -52,6 +52,7 @@ public interface NotificationRestControllerInterface {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Notification was successfully created", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NotificationDto.class)) }),
+            @ApiResponse(responseCode = "208", description = "Returned if the Notification has already been sent."),
             @ApiResponse(responseCode = "400", description = "Returned if the Notification data contained invalid field") })
     @PostMapping("notification/join")
     ResponseEntity<DataResponse<NotificationDto>> createJoinRequest(@RequestBody(required = true) @Valid final NotificationCreateDto request,

@@ -118,7 +118,7 @@ public class NotificationRestController extends BaseController implements Notifi
 
                 if (savedNotification != null) {
                     NotificationDto notificationDto = this.notificationMapper.convertNotificationToNotificationDto(savedNotification);
-                    return buildResponse(notificationDto, HttpStatus.CREATED);
+                    return buildResponse(notificationDto, HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                 }

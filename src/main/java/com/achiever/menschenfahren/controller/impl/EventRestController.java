@@ -15,19 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
 import com.achiever.menschenfahren.base.dto.request.EventEditDto;
-import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.EventRestControllerInterface;
+import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
+import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
+import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.EventMapper;
-import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
@@ -36,20 +39,22 @@ import com.achiever.menschenfahren.service.UserService;
  */
 @RestController
 @RequestMapping(Constants.SERVICE_EVENT_API)
+@Slf4j
 public class EventRestController extends BaseController implements EventRestControllerInterface {
 
     @Autowired
-    private EventService      eventService;
+    private EventService                eventService;
 
     @Autowired
-    private UserService       userService;
+    private UserService                 userService;
 
-    private final EventMapper eventMapper = new EventMapper();
+    private final EventTypeDaoInterface eventTypeDao;
 
-    private final UserMapper  userMapper  = new UserMapper();
+    private final EventMapper           eventMapper = new EventMapper();
 
-    public EventRestController() {
+    public EventRestController(@Nonnull final EventTypeDaoInterface eventTypeDao) {
         super();
+        this.eventTypeDao = eventTypeDao;
     }
 
     /**
@@ -62,6 +67,7 @@ public class EventRestController extends BaseController implements EventRestCont
         final List<EventDto> eventDtoList = new ArrayList<>();
         for (final Event event : events) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
+            eventDto.setEventTypeId(event.getEventType().getId());
             eventDtoList.add(eventDto);
         }
 
@@ -86,6 +92,7 @@ public class EventRestController extends BaseController implements EventRestCont
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             if (eventDto != null) {
                 eventDto.setUserId(event.getUser().getId());
+                eventDto.setEventTypeId(event.getEventType().getId());
                 return buildResponse(eventDto, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.GONE);
@@ -95,30 +102,43 @@ public class EventRestController extends BaseController implements EventRestCont
 
     /**
      * creates Event.
+     *
+     * @throws InvalidEventTypeException
      */
     @Override
-    public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request) throws InvalidEventException {
+    public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request)
+            throws InvalidEventException, InvalidEventTypeException {
 
         final Optional<User> user = this.userService.findById(request.getUserId());
 
         if (user.isPresent()) {
             final User foundUser = user.get();
-            final Event event = this.eventMapper.map(request, Event.class);
-            event.setUser(foundUser);
-            final Event savedEvent = this.eventService.createEvent(event);
 
-            final EventDto eventDto = this.eventMapper.map(savedEvent, EventDto.class);
-            if (eventDto != null) {
-                UserEditDto userEditDto = this.userMapper.map(foundUser, UserEditDto.class);
-                eventDto.setUserId(foundUser.getId());
-                eventDto.setUser(userEditDto);
-            }
-            if (eventDto != null) {
-                return buildResponse(eventDto, HttpStatus.CREATED);
+            Optional<EventType> eventTypeOptional = eventTypeDao.findById(request.getEventTypeId());
+            System.err.println(eventTypeOptional + "######optional");
+            if (eventTypeOptional.isEmpty()) {
+                throw new InvalidEventTypeException("Event type not found with id:" + request.getEventTypeId());
             } else {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                EventType foundEventType = eventTypeOptional.get();
+                final Event event = this.eventMapper.map(request, Event.class);
+                event.setUser(foundUser);
+                event.setEventType(foundEventType);
+                final Event savedEvent = this.eventService.createEvent(event);
+
+                final EventDto eventDto = this.eventMapper.map(savedEvent, EventDto.class);
+                if (eventDto != null) {
+                    eventDto.setUserId(foundUser.getId());
+                    eventDto.setEventTypeId(request.getEventTypeId());
+                }
+                if (eventDto != null) {
+                    return buildResponse(eventDto, HttpStatus.CREATED);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                }
             }
+
         } else {
+            log.warn("User not found with id:" + request.getUserId());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -136,6 +156,7 @@ public class EventRestController extends BaseController implements EventRestCont
         for (final Event event : events) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             eventDto.setUserId(userId);
+            eventDto.setEventTypeId(event.getEventType().getId());
             myEvents.add(eventDto);
         }
 
@@ -156,6 +177,9 @@ public class EventRestController extends BaseController implements EventRestCont
         foundEvent.setPrivate(true);
         final Event savedEvent = this.eventService.merge(foundEvent);
         final EventDto response = eventMapper.map(savedEvent, EventDto.class);
+        // TODO: This is not the nice way to set the values. Need to find a better way to do this.
+        response.setEventTypeId(savedEvent.getEventType().getId());
+        response.setUserId(savedEvent.getUser().getId());
         return buildResponse(response, HttpStatus.OK);
 
     }
@@ -173,6 +197,7 @@ public class EventRestController extends BaseController implements EventRestCont
         final Event savedEvent = this.eventService.merge(event);
         EventDto eventDto = eventMapper.map(savedEvent, EventDto.class);
         eventDto.setUserId(savedEvent.getUser().getId());
+        eventDto.setEventTypeId(savedEvent.getEventType().getId());
         return buildResponse(eventDto, HttpStatus.OK);
 
     }
@@ -188,6 +213,7 @@ public class EventRestController extends BaseController implements EventRestCont
         final Event savedEvent = eventService.createEvent(event);
         final EventDto response = eventMapper.map(savedEvent, EventDto.class);
         response.setUserId(savedEvent.getUser().getId());
+        response.setEventTypeId(savedEvent.getEventType().getId());
         return buildResponse(response, HttpStatus.OK);
     }
 

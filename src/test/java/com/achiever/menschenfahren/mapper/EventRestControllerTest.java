@@ -184,7 +184,7 @@ public class EventRestControllerTest {
         final EventCreateDto createDto = buildEventCreateDto();
         createDto.setUserId(userId);
         createDto.setEventTypeId(eventTypeId);
-
+        createDto.setName("eventName");
         final var response = restController.createEvent(createDto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());

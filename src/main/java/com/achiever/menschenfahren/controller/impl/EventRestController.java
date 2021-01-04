@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
 import com.achiever.menschenfahren.base.dto.request.EventEditDto;
+import com.achiever.menschenfahren.base.dto.request.FilterCreateDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
+import com.achiever.menschenfahren.dao.FilterEventDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.users.User;
@@ -43,19 +45,18 @@ import lombok.extern.slf4j.Slf4j;
 public class EventRestController extends BaseController implements EventRestControllerInterface {
 
     @Autowired
-    private EventService                eventService;
+    private EventService            eventService;
 
     @Autowired
-    private UserService                 userService;
+    private UserService             userService;
 
-    private final EventTypeDaoInterface eventTypeDao;
+    @Autowired
+    private EventTypeDaoInterface   eventTypeDao;
 
-    private final EventMapper           eventMapper = new EventMapper();
+    @Autowired
+    private FilterEventDaoInterface filterEventDao;
 
-    public EventRestController(@Nonnull final EventTypeDaoInterface eventTypeDao) {
-        super();
-        this.eventTypeDao = eventTypeDao;
-    }
+    private final EventMapper       eventMapper = new EventMapper();
 
     /**
      * Get all events based on alsoVoided and alsoPrivate filter.
@@ -233,8 +234,34 @@ public class EventRestController extends BaseController implements EventRestCont
             throw new ResourceNotFoundException("No Event found with id:" + eventId);
         }
         final Event event = eventOptional.get();
-
         return event;
+    }
+
+    @Override
+    public ResponseEntity<DataResponse<List<EventDto>>> filterEvent(@Nonnull final @Valid FilterCreateDto request)
+            throws InvalidEventException, InvalidEventTypeException {
+
+        List<Event> filteredEvents = this.filterEventDao.filterEvent(request);
+
+        if (!filteredEvents.isEmpty()) {
+            final List<EventDto> events = new ArrayList<>();
+
+            for (final Event event : filteredEvents) {
+                final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
+                eventDto.setUserId(event.getUser().getId());
+                eventDto.setEventTypeId(event.getEventType().getId());
+                events.add(eventDto);
+            }
+
+            if (events.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                return buildResponse(events, HttpStatus.OK);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
     }
 
 }

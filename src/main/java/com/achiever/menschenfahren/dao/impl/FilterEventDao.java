@@ -37,20 +37,16 @@ public class FilterEventDao implements FilterEventDaoInterface {
 
     @Override
     public List<Event> filterEvent(@Nonnull final FilterCreateDto request) {
-        System.err.println("inside filter event dao" + request);
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        System.err.println(cb + "###criteria builder");
         CriteriaQuery<Event> cq = cb.createQuery(Event.class);
 
         Root<Event> event = cq.from(Event.class);
         cq.select(event);
         List<Predicate> predicates = new ArrayList<>();
 
-        System.err.println("before if condition");
         if (StringUtils.isNotBlank(request.getCountryId())) {
             Predicate hasCountryName = cb.equal(event.get(Event_.countryCode), request.getCountryId());
             predicates.add(hasCountryName);
-            System.err.println("inside country id");
         }
 
         if (StringUtils.isNotBlank(request.getEventTypeId())) {
@@ -59,7 +55,6 @@ public class FilterEventDao implements FilterEventDaoInterface {
                 EventType eventType = eventTypeOptional.get();
                 Predicate hasEventType = cb.equal(event.get(Event_.eventType), eventType);
                 predicates.add(hasEventType);
-                System.err.println("inside eventType ");
             }
         }
 
@@ -69,7 +64,6 @@ public class FilterEventDao implements FilterEventDaoInterface {
         } else if (request.getFromDate() != null && request.getToDate() != null) {
             Predicate date = cb.between(event.get(Event_.startDate), request.getFromDate(), request.getToDate());
             predicates.add(date);
-            System.err.println("inside start end ");
         } else if (request.getFromDate() == null && request.getToDate() != null) {
             Path<Date> dateToPath = event.get(Event_.endDate);
             predicates.add(cb.lessThanOrEqualTo(dateToPath, request.getToDate()));

@@ -49,6 +49,7 @@ public class FilterEventDao implements FilterEventDaoInterface {
             predicates.add(hasCountryName);
         }
 
+        // create predicate for event type.
         if (StringUtils.isNotBlank(request.getEventTypeId())) {
             Optional<EventType> eventTypeOptional = eventTypeDao.findById(request.getEventTypeId());
             if (eventTypeOptional.isPresent()) {

@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.EventCreateDto;
-import com.achiever.menschenfahren.base.dto.EventDto;
-import com.achiever.menschenfahren.base.dto.EventEditDto;
+import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
+import com.achiever.menschenfahren.base.dto.request.EventEditDto;
+import com.achiever.menschenfahren.base.dto.request.FilterCreateDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
+import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
 import io.swagger.oas.annotations.Operation;
@@ -85,6 +87,7 @@ public interface EventRestControllerInterface {
      *            The request for creating an event.
      * @return
      * @throws InvalidEventException
+     * @throws InvalidEventTypeException
      */
     @Operation(description = "Creates a new Event.")
     @ApiResponses(value = {
@@ -92,7 +95,8 @@ public interface EventRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Returned if the event data contained invalid field") })
     @PostMapping("events")
-    ResponseEntity<DataResponse<EventDto>> createEvent(@RequestBody(required = true) @Valid final EventCreateDto request) throws InvalidEventException;
+    ResponseEntity<DataResponse<EventDto>> createEvent(@RequestBody(required = true) @Valid final EventCreateDto request)
+            throws InvalidEventException, InvalidEventTypeException;
 
     /**
      * Finds events for an user.
@@ -176,4 +180,12 @@ public interface EventRestControllerInterface {
     ResponseEntity<DataResponse<EventDto>> editEvent(@PathVariable(name = CommonConstants.Params.EVENT_ID, required = true) @Nonnull final String eventId,
             @RequestBody(required = true) @Valid final EventEditDto request) throws ResourceNotFoundException;
 
+    @Operation(description = "Returns list of filtered event.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event successfully filtered.", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Returned if the event data contained invalid field") })
+    @PostMapping("filter")
+    ResponseEntity<DataResponse<List<EventDto>>> filterEvent(@RequestBody(required = true) @Valid final FilterCreateDto request)
+            throws InvalidEventException, InvalidEventTypeException;
 }

@@ -47,6 +47,9 @@ public class User extends AbstractBaseEntity {
     @Nonnull
     private String           email;
 
+    @Column(name = "username", length = 50)
+    private String           username;
+
     @Column(name = "password", length = 600)
     @Nonnull
     private String           password;

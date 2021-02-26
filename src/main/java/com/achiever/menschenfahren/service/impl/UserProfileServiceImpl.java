@@ -18,8 +18,12 @@ import com.achiever.menschenfahren.service.UserProfileService;
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
 
+    private final UserProfileDaoInterface userProfileDao;
+
     @Autowired
-    private UserProfileDaoInterface userProfileDao;
+    public UserProfileServiceImpl(@Nonnull final UserProfileDaoInterface userProfileDao) {
+        this.userProfileDao = userProfileDao;
+    }
 
     /**
      *

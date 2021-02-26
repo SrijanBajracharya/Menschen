@@ -2,8 +2,8 @@ package com.achiever.menschenfahren;
 
 import org.junit.jupiter.api.Test;
 
-import com.achiever.menschenfahren.base.dto.UserCreateDto;
-import com.achiever.menschenfahren.base.dto.UserDto;
+import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.mapper.UserMapper;
 
@@ -17,6 +17,7 @@ public class UserMapperTest {
         dto.setLastName("abc");
         dto.setEmail("abc@gmail.com");
         dto.setPassword("abc");
+        dto.setUsername("rvd");
         final User user = mapper.map(dto, User.class);
         final UserDto userDto = mapper.map(user, UserDto.class);
     }

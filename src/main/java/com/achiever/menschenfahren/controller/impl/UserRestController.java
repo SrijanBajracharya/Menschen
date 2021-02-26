@@ -12,13 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.UserCreateDto;
-import com.achiever.menschenfahren.base.dto.UserDto;
+import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.request.UserEditDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidUserException;
+import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.UserService;
 
@@ -93,6 +95,20 @@ public class UserRestController extends BaseController implements UserRestContro
             } else {
                 return new ResponseEntity<>(HttpStatus.GONE);
             }
+        }
+    }
+
+    @Override
+    public ResponseEntity<DataResponse<UserDto>> editUser(String userId, @Valid UserEditDto request) throws ResourceNotFoundException {
+        Optional<User> userOptional = this.userService.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException("The user id doesn't exist in our system.");
+        } else {
+            User user = userOptional.get();
+            this.userMapper.map(request, user);
+            final User savedUser = this.userService.updateUser(user);
+            return buildResponse(this.userMapper.map(savedUser, UserDto.class), HttpStatus.OK);
+
         }
     }
 

@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.EventTypeCreateDto;
-import com.achiever.menschenfahren.base.dto.EventTypeDto;
+import com.achiever.menschenfahren.base.dto.request.EventTypeCreateDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventTypeDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.EventTypeControllerInterface;
 import com.achiever.menschenfahren.entities.events.EventType;

@@ -20,8 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private final UserDaoInterface userDao;
+
     @Autowired
-    private UserDaoInterface userDao;
+    public UserServiceImpl(@Nonnull final UserDaoInterface userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
     public List<User> getUsers(final boolean alsoVoided) {
@@ -65,6 +69,11 @@ public class UserServiceImpl implements UserService {
         return savedUser;
     }
 
+    @Override
+    public User updateUser(@Nonnull final User user) {
+        return userDao.save(user);
+    }
+
     /**
      * De-activates user.
      *
@@ -99,6 +108,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findById(final String uuid) {
         return userDao.findById(uuid);
+    }
+
+    @Override
+    public User findByEmail(String emailId) {
+        return userDao.findByEmail(emailId);
     }
 
 }

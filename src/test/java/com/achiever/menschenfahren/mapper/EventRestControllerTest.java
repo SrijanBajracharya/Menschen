@@ -21,16 +21,20 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
-import com.achiever.menschenfahren.base.dto.EventCreateDto;
-import com.achiever.menschenfahren.base.dto.EventDto;
-import com.achiever.menschenfahren.base.dto.EventEditDto;
+import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
+import com.achiever.menschenfahren.base.dto.request.EventEditDto;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.controller.impl.EventRestController;
 import com.achiever.menschenfahren.dao.EventDaoInterface;
+import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
+import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidEventException;
+import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.service.EventService;
+import com.achiever.menschenfahren.service.EventTypeService;
 import com.achiever.menschenfahren.service.UserService;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -40,26 +44,33 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 @ExtendWith(MockitoExtension.class)
 public class EventRestControllerTest {
 
-    private static PodamFactory factory;
+    private static PodamFactory   factory;
 
-    private static final String userId   = "userId";
-    private static final String voidedId = "voidedId";
-    private static final String eventId  = "eventId";
-
-    @MockBean
-    private EventDaoInterface   eventDao;
+    private static final String   userId      = "userId";
+    private static final String   voidedId    = "voidedId";
+    private static final String   eventId     = "eventId";
+    private static final String   eventTypeId = "eventTypeId";
 
     @MockBean
-    private UserDaoInterface    userDao;
+    private EventDaoInterface     eventDao;
+
+    @MockBean
+    private UserDaoInterface      userDao;
+
+    @MockBean
+    private EventTypeDaoInterface eventTypeDao;
 
     @InjectMocks
-    private EventRestController restController;
+    private EventRestController   restController;
 
     @SpyBean
-    private UserService         userService;
+    private UserService           userService;
 
     @SpyBean
-    private EventService        eventService;
+    private EventService          eventService;
+
+    @SpyBean
+    private EventTypeService      eventTypeService;
 
     @BeforeAll
     protected static void initialize() {
@@ -80,16 +91,24 @@ public class EventRestControllerTest {
         voidedUser.setVoided(true);
         voidedUser.setId(voidedId);
 
+        final EventType eventType = buildEventType();
+        eventType.setId(eventTypeId);
+        eventType.setName("conference");
+        eventType.setVoided(false);
+        eventType.setDescription("Conference event.");
+
         final Event event = buildEvent();
         event.setId(eventId);
         event.setVoided(false);
         event.setPrivate(false);
         event.setUser(user);
+        event.setEventType(eventType);
 
         final Event voidedEvent = buildEvent();
         voidedEvent.setId(eventId);
         voidedEvent.setVoided(true);
         voidedEvent.setPrivate(false);
+        voidedEvent.setEventType(eventType);
 
         final List<Event> allEvents = new ArrayList<>();
         allEvents.add(event);
@@ -111,10 +130,16 @@ public class EventRestControllerTest {
         Mockito.doReturn(Optional.of(event)).when(eventDao).findById(Mockito.eq(eventId));
 
         Mockito.doReturn(Optional.of(user)).when(userDao).findById(Mockito.eq(userId));
+
+        Mockito.doReturn(Optional.of(eventType)).when(eventTypeDao).findById(Mockito.eq(eventTypeId));
     }
 
     private User buildUser() {
         return factory.manufacturePojo(User.class);
+    }
+
+    private EventType buildEventType() {
+        return factory.manufacturePojo(EventType.class);
     }
 
     private Event buildEvent() {
@@ -155,10 +180,11 @@ public class EventRestControllerTest {
     }
 
     @Test
-    public void testCreateEvent() throws InvalidEventException {
+    public void testCreateEvent() throws InvalidEventException, InvalidEventTypeException {
         final EventCreateDto createDto = buildEventCreateDto();
         createDto.setUserId(userId);
-
+        createDto.setEventTypeId(eventTypeId);
+        createDto.setName("eventName");
         final var response = restController.createEvent(createDto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());

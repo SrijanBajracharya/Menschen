@@ -8,17 +8,20 @@ import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
-import com.achiever.menschenfahren.base.dto.DataResponse;
-import com.achiever.menschenfahren.base.dto.UserCreateDto;
-import com.achiever.menschenfahren.base.dto.UserDto;
+import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
+import com.achiever.menschenfahren.base.dto.request.UserEditDto;
+import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.InvalidUserException;
+import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
 import io.swagger.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -97,5 +100,17 @@ public interface UserRestControllerInterface {
     ResponseEntity<DataResponse<UserDto>> getUser(@PathVariable(name = "userId", required = true) @Nonnull final String userId,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws InvalidUserException;
+
+    @Operation(description = "Updates an exisiting user data.")
+    @Parameters(value = { @Parameter(name = "request", description = "The fields as request body that can be changed during a basic edit operation"),
+            @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user as part of the path.") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User profile was successfully edited", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "The given user wasn't valid for an update operation."),
+            @ApiResponse(responseCode = "404", description = "The user with the given id doesn't exist", content = @Content()) })
+    @PatchMapping("user/{" + CommonConstants.Params.USER_ID + "}/edit")
+    ResponseEntity<DataResponse<UserDto>> editUser(@PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId,
+            @RequestBody(required = true) @Valid final UserEditDto request) throws ResourceNotFoundException;
 
 }

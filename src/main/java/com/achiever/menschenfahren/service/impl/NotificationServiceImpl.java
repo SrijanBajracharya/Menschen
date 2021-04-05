@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.achiever.menschenfahren.dao.NotificationDaoInterface;
+import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.notification.Notification;
+import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.service.NotificationService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +29,22 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationDaoInterface notificationDao;
 
+    private final UserDaoInterface         userDao;
+
     @Autowired
-    public NotificationServiceImpl(final NotificationDaoInterface notificationDao) {
+    public NotificationServiceImpl(final NotificationDaoInterface notificationDao, @Nonnull final UserDaoInterface userDao) {
         this.notificationDao = notificationDao;
+        this.userDao = userDao;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Notification createNotification(@Nonnull final Notification notification) {
+    @Transactional
+    public Notification createNotification(@Nonnull final Notification notification, @Nonnull final User senderUser, @Nonnull final User receiverUser) {
+        this.userDao.save(senderUser);
+        this.userDao.save(receiverUser);
         return notificationDao.save(notification);
     }
 
@@ -78,6 +87,11 @@ public class NotificationServiceImpl implements NotificationService {
     public Notification findByOriginalSenderIdAndOriginalReceiverIdAndEventId(@Nonnull final String originalSenderId, @Nonnull final String originalReceiverId,
             @Nonnull final String eventId) {
         return notificationDao.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(originalSenderId, originalReceiverId, eventId);
+    }
+
+    @Override
+    public Notification updateNotification(@Nonnull final Notification notification) {
+        return notificationDao.save(notification);
     }
 
 }

@@ -47,6 +47,7 @@ public interface NotificationRestControllerInterface {
      * @return The created notification.
      * @throws InvalidNotificationException
      *             Thrown if the notification request is invalid.
+     * @throws ResourceNotFoundException
      */
     @Operation(description = "Creates a new Notification.")
     @ApiResponses(value = {
@@ -57,7 +58,7 @@ public interface NotificationRestControllerInterface {
     @PostMapping("notification/join")
     ResponseEntity<DataResponse<NotificationDto>> createJoinRequest(@RequestBody(required = true) @Valid final NotificationCreateDto request,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
-            throws InvalidNotificationException;
+            throws ResourceNotFoundException, InvalidNotificationException;
 
     /**
      * Creates a new invite notification.
@@ -67,6 +68,7 @@ public interface NotificationRestControllerInterface {
      * @return Created notification.
      * @throws InvalidNotificationException
      *             Thrown if the notification request is invalid.
+     * @throws ResourceNotFoundException
      */
     @Operation(description = "Creates a new Notification.")
     @ApiResponses(value = {
@@ -78,7 +80,7 @@ public interface NotificationRestControllerInterface {
             @ApiResponse(responseCode = "404", description = "Returned if the receiver email id is not found in the system.") })
     @PostMapping("notification/invite")
     ResponseEntity<DataResponse<NotificationDto>> createInviteRequest(@RequestBody(required = true) @Valid final NotificationInviteDto request)
-            throws InvalidNotificationException;
+            throws InvalidNotificationException, ResourceNotFoundException;
 
     /***
      * Updates the state of the notification.

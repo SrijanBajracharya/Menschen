@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import com.achiever.menschenfahren.entities.notification.Notification;
+import com.achiever.menschenfahren.entities.users.User;
 
 /**
  * Interface handling all functionality for notification.
@@ -22,7 +23,9 @@ public interface NotificationService {
      *            The object to be saved.
      * @return The saved notification object.
      */
-    Notification createNotification(@Nonnull final Notification notification);
+    Notification createNotification(@Nonnull final Notification notification, @Nonnull final User senderUser, @Nonnull final User receiverUser);
+
+    Notification updateNotification(@Nonnull final Notification notification);
 
     /**
      * Find notification by id.

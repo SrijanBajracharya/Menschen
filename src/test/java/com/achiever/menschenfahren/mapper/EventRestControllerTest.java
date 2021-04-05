@@ -35,7 +35,6 @@ import com.achiever.menschenfahren.exception.InvalidEventException;
 import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.EventTypeService;
-import com.achiever.menschenfahren.service.UserService;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -62,9 +61,6 @@ public class EventRestControllerTest {
 
     @InjectMocks
     private EventRestController   restController;
-
-    @SpyBean
-    private UserService           userService;
 
     @SpyBean
     private EventService          eventService;

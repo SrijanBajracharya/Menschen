@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
+import com.achiever.menschenfahren.base.dto.request.FriendsDto;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
@@ -101,6 +102,14 @@ public interface UserRestControllerInterface {
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws InvalidUserException;
 
+    /**
+     * Returns the updated User.
+     *
+     * @param userId
+     * @param request
+     * @return
+     * @throws ResourceNotFoundException
+     */
     @Operation(description = "Updates an exisiting user data.")
     @Parameters(value = { @Parameter(name = "request", description = "The fields as request body that can be changed during a basic edit operation"),
             @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user as part of the path.") })
@@ -112,5 +121,16 @@ public interface UserRestControllerInterface {
     @PatchMapping("user/{" + CommonConstants.Params.USER_ID + "}/edit")
     ResponseEntity<DataResponse<UserDto>> editUser(@PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId,
             @RequestBody(required = true) @Valid final UserEditDto request) throws ResourceNotFoundException;
+
+    @Operation(description = "Get list of Friend for a given user.")
+    @Parameters(value = { @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user as part of the path.") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found Friends for a user.", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = FriendsDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "The given user wasn't valid for an update operation."),
+            @ApiResponse(responseCode = "404", description = "The user with the given id doesn't exist", content = @Content()) })
+    @GetMapping("friend/{" + CommonConstants.Params.USER_ID + "}")
+    ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(
+            @PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId) throws ResourceNotFoundException;
 
 }

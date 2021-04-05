@@ -32,7 +32,6 @@ import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.service.UserProfileService;
-import com.achiever.menschenfahren.service.UserService;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -52,9 +51,6 @@ public class UserRestControllerTest {
 
     @InjectMocks
     private UserRestController        restController;
-
-    @SpyBean
-    private UserService               userService;
 
     @MockBean
     private UserProfileDaoInterface   userProfileDto;

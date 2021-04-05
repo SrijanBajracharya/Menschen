@@ -25,6 +25,7 @@ import com.achiever.menschenfahren.base.model.NotificationStatus;
 import com.achiever.menschenfahren.base.model.NotificationType;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.NotificationRestControllerInterface;
+import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.notification.Notification;
 import com.achiever.menschenfahren.entities.users.User;
@@ -33,7 +34,6 @@ import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.NotificationMapper;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.NotificationService;
-import com.achiever.menschenfahren.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,17 +50,17 @@ public class NotificationRestController extends BaseController implements Notifi
 
     private final NotificationService notificationService;
 
-    private final UserService         userService;
+    private final UserDaoInterface    userDao;
 
     private final NotificationMapper  notificationMapper;
 
     private final EventService        eventService;
 
     @Autowired
-    public NotificationRestController(@Nonnull final NotificationService notificationService, @Nonnull final UserService userService,
+    public NotificationRestController(@Nonnull final NotificationService notificationService, @Nonnull final UserDaoInterface userDao,
             @Nonnull final EventService eventService) {
         this.notificationService = notificationService;
-        this.userService = userService;
+        this.userDao = userDao;
         this.eventService = eventService;
         this.notificationMapper = new NotificationMapper();
 
@@ -178,7 +178,7 @@ public class NotificationRestController extends BaseController implements Notifi
 
         System.err.println(request.getEventId() + "##" + request.getOriginalSenderId() + "###senderId" + request.getReceiverEmailId() + "emailid");
 
-        User receiverUser = this.userService.findByEmail(request.getReceiverEmailId());
+        User receiverUser = this.userDao.findByEmail(request.getReceiverEmailId());
 
         System.err.println(receiverUser + "####receiverUser");
 
@@ -234,7 +234,7 @@ public class NotificationRestController extends BaseController implements Notifi
         notification.setNotificationType(NotificationType.INVITE);
         notification.setNotificationStatus(NotificationStatus.PENDING);
 
-        Optional<User> OptionalSenderUser = this.userService.findById(request.getOriginalSenderId());
+        Optional<User> OptionalSenderUser = this.userDao.findById(request.getOriginalSenderId());
         if (OptionalSenderUser.isEmpty()) {
             throw new ResourceNotFoundException("The logged in user information not found");
         }
@@ -267,12 +267,12 @@ public class NotificationRestController extends BaseController implements Notifi
         notification.setNotificationType(NotificationType.fromString(request.getNotificationType()));
         notification.setNotificationStatus(NotificationStatus.getByName(request.getNotificationStatus()));
 
-        Optional<User> optionalSenderUser = this.userService.findById(request.getOriginalSenderId());
+        Optional<User> optionalSenderUser = this.userDao.findById(request.getOriginalSenderId());
         if (optionalSenderUser.isEmpty()) {
             throw new ResourceNotFoundException("The logged in user information not found with id: " + request.getOriginalSenderId());
         }
 
-        Optional<User> optionalReceiverUser = this.userService.findById(request.getOriginalReceiverId());
+        Optional<User> optionalReceiverUser = this.userDao.findById(request.getOriginalReceiverId());
 
         if (optionalReceiverUser.isEmpty()) {
             throw new ResourceNotFoundException("The receiver user information not found with id: " + request.getOriginalReceiverId());

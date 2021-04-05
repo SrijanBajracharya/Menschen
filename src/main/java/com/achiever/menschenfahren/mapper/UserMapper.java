@@ -1,5 +1,6 @@
 package com.achiever.menschenfahren.mapper;
 
+import com.achiever.menschenfahren.base.dto.request.FriendsDto;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.UserDto;
@@ -15,6 +16,7 @@ public class UserMapper extends ConfigurableMapper {
 
         factory.classMap(User.class, UserDto.class).byDefault().register();
         factory.classMap(User.class, UserCreateDto.class).byDefault().register();
+        factory.classMap(User.class, FriendsDto.class).byDefault().register();
         factory.classMap(User.class, UserEditDto.class).mapNullsInReverse(false).byDefault().register();
     }
 

@@ -25,6 +25,7 @@ import com.achiever.menschenfahren.base.dto.response.UserProfileDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserProfileRestControllerInterface;
 import com.achiever.menschenfahren.dao.AvatarDaoInterface;
+import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.Avatar;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
@@ -34,7 +35,6 @@ import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.mapper.UserProfileMapper;
 import com.achiever.menschenfahren.service.UserProfileService;
-import com.achiever.menschenfahren.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,7 +56,7 @@ public class UserProfileRestController extends BaseController implements UserPro
     private AvatarDaoInterface       avatarDao;
 
     @Autowired
-    private UserService              userService;
+    private UserDaoInterface         userDao;
 
     /**
      * {@inheritDoc}
@@ -65,7 +65,7 @@ public class UserProfileRestController extends BaseController implements UserPro
     public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull final String userId, @Nonnull @Valid final UserProfileCreateDto request,
             final boolean alsoVoided) throws InvalidUserException {
 
-        final Optional<User> user = this.userService.findByIdAndVoided(userId, alsoVoided);
+        final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (user.isPresent()) {
             final User savedUser = user.get();
             request.setUserId(userId);
@@ -106,7 +106,7 @@ public class UserProfileRestController extends BaseController implements UserPro
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(@Nonnull final String userId, final boolean alsoVoided)
             throws ResourceNotFoundException, MultipleResourceFoundException {
-        final Optional<User> user = this.userService.findByIdAndVoided(userId, alsoVoided);
+        final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
 
         if (user.isPresent()) {
             User savedUser = user.get();

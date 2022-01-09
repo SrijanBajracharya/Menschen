@@ -126,6 +126,7 @@ public class FavoriteRestController extends BaseController implements FavoritesR
         for (Favorites favorite : favorites) {
             AllFavoritesResponse favoriteResponseDto = this.favoritesMapper.map(favorite, AllFavoritesResponse.class);
             favoriteResponseDto.getEvent().setUserId(userId);
+            favoriteResponseDto.getEvent().setEventTypeId(favorite.getEvent().getEventType().getId());
             allFavorites.add(favoriteResponseDto);
 
         }

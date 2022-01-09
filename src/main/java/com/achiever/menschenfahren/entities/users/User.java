@@ -1,14 +1,20 @@
 package com.achiever.menschenfahren.entities.users;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -71,6 +77,12 @@ public class User extends AbstractBaseEntity {
     @Column(name = "deactivated_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
     private Date             deactivatedTimestamp;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "friends", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "friend_id")
+    @Nonnull
+    private Set<String>      friends = new HashSet<>();
 
     public User() {
         super();

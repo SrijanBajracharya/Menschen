@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
@@ -32,7 +33,6 @@ import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.service.UserProfileService;
-import com.achiever.menschenfahren.service.UserService;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -53,9 +53,6 @@ public class UserRestControllerTest {
     @InjectMocks
     private UserRestController        restController;
 
-    @SpyBean
-    private UserService               userService;
-
     @MockBean
     private UserProfileDaoInterface   userProfileDto;
 
@@ -64,6 +61,9 @@ public class UserRestControllerTest {
 
     @SpyBean
     private UserProfileService        userProfileService;
+
+    @MockBean
+    private PasswordEncoder           bcryptEncoder;
 
     @BeforeAll
     protected static void initialize() {

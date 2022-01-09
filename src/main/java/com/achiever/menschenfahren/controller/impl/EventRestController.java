@@ -22,6 +22,7 @@ import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.dao.FilterEventDaoInterface;
+import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.users.User;
@@ -30,7 +31,6 @@ import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.service.EventService;
-import com.achiever.menschenfahren.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +48,7 @@ public class EventRestController extends BaseController implements EventRestCont
     private EventService            eventService;
 
     @Autowired
-    private UserService             userService;
+    private UserDaoInterface        userDao;
 
     @Autowired
     private EventTypeDaoInterface   eventTypeDao;
@@ -69,6 +69,7 @@ public class EventRestController extends BaseController implements EventRestCont
         for (final Event event : events) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             eventDto.setEventTypeId(event.getEventType().getId());
+            eventDto.setUserId(event.getUser().getId());
             eventDtoList.add(eventDto);
         }
 
@@ -110,13 +111,12 @@ public class EventRestController extends BaseController implements EventRestCont
     public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request)
             throws InvalidEventException, InvalidEventTypeException {
 
-        final Optional<User> user = this.userService.findById(request.getUserId());
+        final Optional<User> user = this.userDao.findById(request.getUserId());
 
         if (user.isPresent()) {
             final User foundUser = user.get();
 
             Optional<EventType> eventTypeOptional = eventTypeDao.findById(request.getEventTypeId());
-            System.err.println(eventTypeOptional + "######optional");
             if (eventTypeOptional.isEmpty()) {
                 throw new InvalidEventTypeException("Event type not found with id:" + request.getEventTypeId());
             } else {

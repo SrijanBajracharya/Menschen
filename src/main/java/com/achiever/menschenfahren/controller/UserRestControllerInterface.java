@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.achiever.menschenfahren.base.constants.CommonConstants;
 import com.achiever.menschenfahren.base.dto.request.FriendsDto;
+import com.achiever.menschenfahren.base.dto.request.JwtRequest;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
@@ -133,4 +134,18 @@ public interface UserRestControllerInterface {
     ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(
             @PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId) throws ResourceNotFoundException;
 
+    /**
+     * Returns the token if the credentials are correct.
+     *
+     * @param authenticationRequest
+     * @return
+     * @throws Exception
+     */
+    @Operation(description = "Returns the authentication token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Credentials matches", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
+            @ApiResponse(responseCode = "401", description = "Credential not matched. Unauthorized") })
+    @PostMapping(value = "authenticate")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception;
 }

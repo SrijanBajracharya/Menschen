@@ -69,6 +69,7 @@ public class EventRestController extends BaseController implements EventRestCont
         for (final Event event : events) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             eventDto.setEventTypeId(event.getEventType().getId());
+            eventDto.setUserId(event.getUser().getId());
             eventDtoList.add(eventDto);
         }
 

@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
@@ -60,6 +61,9 @@ public class UserRestControllerTest {
 
     @SpyBean
     private UserProfileService        userProfileService;
+
+    @MockBean
+    private PasswordEncoder           bcryptEncoder;
 
     @BeforeAll
     protected static void initialize() {

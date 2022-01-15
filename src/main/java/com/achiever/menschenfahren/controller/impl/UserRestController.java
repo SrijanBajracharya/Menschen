@@ -38,6 +38,7 @@ import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.security.jwt.JwtTokenUtil;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 /**
  *
@@ -53,18 +54,15 @@ public class UserRestController extends BaseController implements UserRestContro
     @Autowired
     private UserDaoInterface            userDao;
 
-    private final AuthenticationManager authenticationManager;
-
-    private final JwtTokenUtil          jwtTokenUtil;
-
     @Autowired
     private PasswordEncoder             bcryptEncoder;
+    
+    @Autowired
+    private AuthenticationService authenticationService;
 
-    public UserRestController(@Nonnull final AuthenticationManager authenticationManager, @Nonnull final JwtTokenUtil jwtTokenUtil) {
+    public UserRestController() {
         super();
         this.userMapper = new UserMapper();
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     /**
@@ -182,27 +180,7 @@ public class UserRestController extends BaseController implements UserRestContro
 
     @Override
     public ResponseEntity<?> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
-        final User user = userDao.findByEmail(authenticationRequest.getEmail());
-
-        if (user == null) {
-            throw new EmailNotFoundException("User email not found.");
-        }
-
-        final String token = jwtTokenUtil.generateToken(user);
-
-        return ResponseEntity.ok(new JwtResponse(token));
-    }
-
-    private void authenticate(String username, String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new DisabledException("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new InvalidCredentialsException("INVALID_CREDENTIALS", e);
-        }
+        return buildResponse(authenticationService.authenticate(authenticationRequest), HttpStatus.OK);
     }
 
 }

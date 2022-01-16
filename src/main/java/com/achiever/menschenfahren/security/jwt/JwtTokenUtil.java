@@ -48,7 +48,7 @@ public class JwtTokenUtil implements Serializable {
      * @param token
      * @return
      */
-    public Claims fetchAllClaimsFromToken(String token) {
+    private Claims fetchAllClaimsFromToken(String token) {
         return getAllClaimsFromToken(token);
     }
 
@@ -90,7 +90,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     // validate token
-    public Boolean validateToken(String token, User user) {
+	public Boolean validateToken(String token, User user) {
         final String email = getSubjectByToken(token);
         Claims claims = fetchAllClaimsFromToken(token);
         String username = claims.get(Constants.TOKEN.CLAIM_USERNAME).toString();

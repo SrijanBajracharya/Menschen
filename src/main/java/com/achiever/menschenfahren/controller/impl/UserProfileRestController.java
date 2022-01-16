@@ -35,6 +35,7 @@ import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.mapper.UserProfileMapper;
 import com.achiever.menschenfahren.service.UserProfileService;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,14 +59,17 @@ public class UserProfileRestController extends BaseController implements UserPro
     @Autowired
     private UserDaoInterface         userDao;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull final String userId, @Nonnull @Valid final UserProfileCreateDto request,
+    public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull @Valid final UserProfileCreateDto request,
             final boolean alsoVoided) throws InvalidUserException {
-
-        final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
+    	String userId = authenticationService.getId();
+    	final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (user.isPresent()) {
             final User savedUser = user.get();
             request.setUserId(userId);
@@ -97,15 +101,16 @@ public class UserProfileRestController extends BaseController implements UserPro
      */
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
-        final UserProfile userProfile = this.findUserProfileById(id);
+    	final UserProfile userProfile = this.findUserProfileById(id);
         final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
         return buildResponse(savedUserProfileDto, HttpStatus.OK);
 
     }
 
     @Override
-    public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(@Nonnull final String userId, final boolean alsoVoided)
+    public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(final boolean alsoVoided)
             throws ResourceNotFoundException, MultipleResourceFoundException {
+    	String userId = authenticationService.getId();
         final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
 
         if (user.isPresent()) {
@@ -161,7 +166,9 @@ public class UserProfileRestController extends BaseController implements UserPro
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<String> updateUserPicture(@Nonnull final MultipartFile avatar, @Nonnull final String userId) {
+    public ResponseEntity<String> updateUserPicture(@Nonnull final MultipartFile avatar) {
+    	String userId = authenticationService.getId();
+
         final var contentType = avatar.getContentType();
         if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
             return ResponseEntity.badRequest().body("Invalid image type. Only allowed: " + ALLOWED_CONTENT_TYPES);
@@ -200,7 +207,8 @@ public class UserProfileRestController extends BaseController implements UserPro
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<byte[]> getAvatar(@Nonnull final String userId) {
+    public ResponseEntity<byte[]> getAvatar() {
+    	String userId = authenticationService.getId();
         final Optional<Avatar> avatar = this.avatarDao.findByUserId(userId);
         if (avatar.isPresent() && null != avatar.get().getAvatar()) {
             final var mediaType = avatar.get().getAvatarType();

@@ -5,8 +5,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -102,11 +104,30 @@ public interface UserRestControllerInterface {
     ResponseEntity<DataResponse<UserDto>> getUser(@PathVariable(name = "userId", required = true) @Nonnull final String userId,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws InvalidUserException;
+    
+    /**
+     * Returns the user based on userId
+     * @param alsoVoided
+     *            Active or deactive user.
+     * @return
+     * @throws InvalidEventException
+     */
+    @Operation(description = "Returns the user identified by token")
+    @Parameters(value = { @Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided users are also considered and returned.") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the User", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "The user details is incomplete"),
+            @ApiResponse(responseCode = "410", description = "The user has been voided"),
+            @ApiResponse(responseCode = "404", description = "No user found with the userId") })
+    @GetMapping("user")
+    ResponseEntity<DataResponse<UserDto>> getUserByToken(
+    		@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
+            throws InvalidUserException;
 
     /**
      * Returns the updated User.
      *
-     * @param userId
      * @param request
      * @return
      * @throws ResourceNotFoundException
@@ -119,9 +140,8 @@ public interface UserRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The given user wasn't valid for an update operation."),
             @ApiResponse(responseCode = "404", description = "The user with the given id doesn't exist", content = @Content()) })
-    @PatchMapping("user/{" + CommonConstants.Params.USER_ID + "}/edit")
-    ResponseEntity<DataResponse<UserDto>> editUser(@PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId,
-            @RequestBody(required = true) @Valid final UserEditDto request) throws ResourceNotFoundException;
+    @PatchMapping("user/edit")
+    ResponseEntity<DataResponse<UserDto>> editUser(@RequestBody(required = true) @Valid final UserEditDto request) throws ResourceNotFoundException;
 
     @Operation(description = "Get list of Friend for a given user.")
     @Parameters(value = { @Parameter(name = CommonConstants.Params.USER_ID, description = "The id of the user as part of the path.") })
@@ -130,9 +150,8 @@ public interface UserRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = FriendsDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The given user wasn't valid for an update operation."),
             @ApiResponse(responseCode = "404", description = "The user with the given id doesn't exist", content = @Content()) })
-    @GetMapping("friend/{" + CommonConstants.Params.USER_ID + "}")
-    ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(
-            @PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId) throws ResourceNotFoundException;
+    @GetMapping("friend")
+    ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList() throws ResourceNotFoundException;
 
     /**
      * Returns the token if the credentials are correct.

@@ -25,18 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private final JwtUserDetailsService jwtUserDetailsService;
+	@Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
 
-    private final JwtTokenUtil          jwtTokenUtil;
+	@Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private UserDaoInterface            userDao;
-
-    @Autowired
-    public JwtRequestFilter(@Nonnull final JwtTokenUtil jwtTokenUtil, @Nonnull final JwtUserDetailsService jwtUserDetailsService) {
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.jwtUserDetailsService = jwtUserDetailsService;
-    }
+    private UserDaoInterface userDao;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -71,7 +67,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (jwtTokenUtil.validateToken(jwtToken, user)) {
 
                 ExtendedUserDetails userDetails = this.jwtUserDetailsService.loadByEmail(user);
-
+                
                 EmailPasswordAuthenticationToken emailPasswordAuthenticationToken = new EmailPasswordAuthenticationToken(userDetails, null,
                         userDetails.getAuthorities());
 

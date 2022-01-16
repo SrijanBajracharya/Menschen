@@ -8,15 +8,10 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
-import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,17 +22,14 @@ import com.achiever.menschenfahren.base.dto.request.JwtRequest;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
-import com.achiever.menschenfahren.base.dto.response.JwtResponse;
 import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.EmailNotFoundException;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
-import com.achiever.menschenfahren.security.jwt.JwtTokenUtil;
 import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 /**
@@ -122,8 +114,10 @@ public class UserRestController extends BaseController implements UserRestContro
     }
 
     @Override
-    public ResponseEntity<DataResponse<UserDto>> editUser(@Nonnull final String userId, @Valid @Nonnull final UserEditDto request)
+    public ResponseEntity<DataResponse<UserDto>> editUser(@Valid @Nonnull final UserEditDto request)
             throws ResourceNotFoundException {
+		String userId = authenticationService.getId();
+
         Optional<User> userOptional = this.userDao.findById(userId);
         if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException("The user id doesn't exist in our system.");
@@ -158,7 +152,8 @@ public class UserRestController extends BaseController implements UserRestContro
     }
 
     @Override
-    public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(@Nonnull final String userId) throws ResourceNotFoundException {
+    public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList() throws ResourceNotFoundException {
+		String userId = authenticationService.getId();
 
         Optional<User> userOptional = userDao.findById(userId);
         if (userOptional.isEmpty()) {
@@ -182,5 +177,22 @@ public class UserRestController extends BaseController implements UserRestContro
     public ResponseEntity<?> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
         return buildResponse(authenticationService.authenticate(authenticationRequest), HttpStatus.OK);
     }
+
+	public ResponseEntity<DataResponse<UserDto>> getUserByToken(boolean alsoVoided) throws InvalidUserException {
+		String userId = authenticationService.getId();
+		final Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
+        if (!userOptional.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            final User user = userOptional.get();
+            final UserDto userDto = this.userMapper.map(user, UserDto.class);
+
+            if (userDto != null) {
+                return buildResponse(userDto, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.GONE);
+            }
+        }
+	}
 
 }

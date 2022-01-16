@@ -2,10 +2,13 @@ package com.achiever.menschenfahren.service.impl;
 
 import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.achiever.menschenfahren.base.dto.request.JwtRequest;
@@ -14,7 +17,9 @@ import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.EmailNotFoundException;
 import com.achiever.menschenfahren.security.jwt.JwtTokenUtil;
+import com.achiever.menschenfahren.security.model.ExtendedUserDetails;
 import com.achiever.menschenfahren.service.AuthenticationServiceInterface;
+import org.springframework.security.core.Authentication;
 
 @Service
 public class AuthenticationService implements AuthenticationServiceInterface{
@@ -41,6 +46,25 @@ public class AuthenticationService implements AuthenticationServiceInterface{
 		return jwtTokenUtil.generateToken(user);
 	}
 	
+	
+	public String getEmail() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+		    ExtendedUserDetails userDetails = (ExtendedUserDetails) auth.getPrincipal();
+		    return userDetails.getEmail();
+		}
+		return "";
+	}
+	
+	public String getId() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+		    ExtendedUserDetails userDetails = (ExtendedUserDetails) auth.getPrincipal();
+		    return userDetails.getId();
+		}
+		return "";
+		
+	}
 	private void authenticate(String username, String password) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));

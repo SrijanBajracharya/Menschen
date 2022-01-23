@@ -21,6 +21,8 @@ import com.achiever.menschenfahren.exception.InvalidFavoriteException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
 import io.swagger.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,12 +54,12 @@ public interface FavoritesRestControllerInterface {
             @ApiResponse(responseCode = "400", description = "Returned if the Favorite data contained invalid field"),
             @ApiResponse(responseCode = "404", description = "Returned if the event id is not found in the system."),
             @ApiResponse(responseCode = "200", description = "Returned if the event is removed for the given user.") })
-    @PostMapping("favorite")
+    @PostMapping("favorites")
     ResponseEntity<DataResponse<FavoritesDto>> createAndRemoveFavorite(@RequestBody(required = true) @Valid final FavoriteCreateDto request)
             throws InvalidFavoriteException, ResourceNotFoundException;
 
     /**
-     * Returns all favorites for a provided user.
+     * Returns all favorites for a provided user token.
      *
      * @param userId
      *            The id of an user.
@@ -71,10 +73,10 @@ public interface FavoritesRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AllFavoritesResponse.class)) }),
             @ApiResponse(responseCode = "204", description = "Found no visible Favorites", content = @Content()),
             @ApiResponse(responseCode = "400", description = "The request is incomplete") })
-    @GetMapping("favorites/{" + CommonConstants.Params.USER_ID + "}")
-    ResponseEntity<DataResponse<List<AllFavoritesResponse>>> getFavoritesByUserId(
-            @PathVariable(name = CommonConstants.Params.USER_ID, required = true) @Nonnull final String userId) throws InvalidFavoriteException;
+    @GetMapping("favorites")
+    ResponseEntity<DataResponse<List<AllFavoritesResponse>>> getFavorites() throws InvalidFavoriteException;
 
+    
     /**
      * Removes favorite and returns updated list.
      *
@@ -92,7 +94,7 @@ public interface FavoritesRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AllFavoritesResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Returned if the event id is not found in the system."),
             @ApiResponse(responseCode = "400", description = "The request is incomplete") })
-    @PostMapping("favorite/remove")
+    @PostMapping("favorites/remove")
     ResponseEntity<DataResponse<List<AllFavoritesResponse>>> removeFavorite(@RequestBody(required = true) @Valid final FavoriteCreateDto request)
             throws InvalidFavoriteException, ResourceNotFoundException;
 }

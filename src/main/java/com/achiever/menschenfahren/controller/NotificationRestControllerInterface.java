@@ -55,7 +55,7 @@ public interface NotificationRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NotificationDto.class)) }),
             @ApiResponse(responseCode = "208", description = "Returned if the Notification has already been sent."),
             @ApiResponse(responseCode = "400", description = "Returned if the Notification data contained invalid field") })
-    @PostMapping("notification/join")
+    @PostMapping("notification/requestToJoin")
     ResponseEntity<DataResponse<NotificationDto>> createJoinRequest(@RequestBody(required = true) @Valid final NotificationCreateDto request,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws ResourceNotFoundException, InvalidNotificationException;
@@ -100,7 +100,7 @@ public interface NotificationRestControllerInterface {
      *             The request data is not valid.
      */
     @Operation(description = "Updates an exisiting notification.")
-    @Parameters(value = { @Parameter(name = "request", description = "The fields as request body that can be changed during a basic edit operation"),
+    @Parameters(value = {
             @Parameter(name = CommonConstants.Params.NOTIFICATION_ID, description = "The id of the notification as part of the path."),
             @Parameter(name = CommonConstants.Params.SENDER_ID, description = "The original sender id of the notification as part of the path."),
             @Parameter(name = CommonConstants.Params.RECEIVER_ID, description = "The original receiver id of the notification as part of the path.") })
@@ -109,19 +109,15 @@ public interface NotificationRestControllerInterface {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = NotificationDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The given notification wasn't valid for an update operation."),
             @ApiResponse(responseCode = "404", description = "The notification with the given id doesn't exist", content = @Content()) })
-    @PatchMapping("notification/{" + CommonConstants.Params.NOTIFICATION_ID + "}/update/{" + CommonConstants.Params.SENDER_ID + "}/{"
-            + CommonConstants.Params.RECEIVER_ID + "}")
+    @PatchMapping("notification/{" + CommonConstants.Params.NOTIFICATION_ID + "}/sender/{" + CommonConstants.Params.SENDER_ID + "}")
     ResponseEntity<DataResponse<NotificationDto>> updateNotification(
             @PathVariable(name = CommonConstants.Params.NOTIFICATION_ID, required = true) @Nonnull final String notificationId,
             @PathVariable(name = CommonConstants.Params.SENDER_ID, required = true) @Nonnull final String originalSenderId,
-            @PathVariable(name = CommonConstants.Params.RECEIVER_ID, required = true) @Nonnull final String originalRecieverId,
             @RequestBody(required = true) @Valid final NotificationEditDto request) throws ResourceNotFoundException, InvalidNotificationException;
 
     /**
      * Returns all notification related to the user
      *
-     * @param userId
-     *            The id of user.
      * @param alsoVoided
      * @return Returns the notification dto object.
      * @throws InvalidNotificationException
@@ -134,9 +130,8 @@ public interface NotificationRestControllerInterface {
             @ApiResponse(responseCode = "204", description = "Found no visible Notification", content = @Content()),
             @ApiResponse(responseCode = "400", description = "The notification data is incomplete"),
             @ApiResponse(responseCode = "410", description = "The notification has been voided") })
-    @GetMapping("notification/{" + CommonConstants.Params.USER_ID + "}")
-    ResponseEntity<DataResponse<List<NotificationDto>>> getNotificationsByUserId(
-            @PathVariable(name = CommonConstants.Params.USER_ID, required = true) final String userId,
+    @GetMapping("notification")
+    ResponseEntity<DataResponse<List<NotificationDto>>> ggetNotificationByToken(
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws InvalidNotificationException;
 

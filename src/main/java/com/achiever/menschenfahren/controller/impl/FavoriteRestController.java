@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import com.achiever.menschenfahren.entities.events.Favorites;
 import com.achiever.menschenfahren.exception.InvalidFavoriteException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.FavoritesMapper;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 /**
  * Rest controller for handling all features related to favorite.
@@ -42,6 +44,9 @@ public class FavoriteRestController extends BaseController implements FavoritesR
     private final FavoritesDaoInterface favoriteDao;
 
     private final FavoritesMapper       favoritesMapper;
+    
+    @Autowired
+    private AuthenticationService authenticationService;
 
     public FavoriteRestController(@Nonnull final EventDaoInterface eventDao, @Nonnull final FavoritesDaoInterface favoriteDao) {
         this.eventDao = eventDao;
@@ -56,7 +61,9 @@ public class FavoriteRestController extends BaseController implements FavoritesR
     public ResponseEntity<DataResponse<FavoritesDto>> createAndRemoveFavorite(@Nonnull final @Valid FavoriteCreateDto request)
             throws InvalidFavoriteException, ResourceNotFoundException {
 
-        if (StringUtils.isAnyBlank(request.getUserId(), request.getEventId())) {
+		String userId = authenticationService.getId();
+
+        if (StringUtils.isAnyBlank(userId, request.getEventId())) {
             throw new InvalidFavoriteException("The request is invalid.");
         }
 
@@ -65,10 +72,10 @@ public class FavoriteRestController extends BaseController implements FavoritesR
             throw new ResourceNotFoundException("The event not found  with id:" + request.getEventId());
         } else {
             Event event = eventOptional.get();
-            Optional<Favorites> favoritesOptional = this.favoriteDao.findByUserIdAndEvent(request.getUserId(), event);
+            Optional<Favorites> favoritesOptional = this.favoriteDao.findByUserIdAndEvent(userId, event);
 
             if (favoritesOptional.isEmpty()) {
-                Favorites favorites = createFavorite(request, event);
+                Favorites favorites = createFavorite(userId, event);
 
                 Favorites savedFavorites = this.favoriteDao.save(favorites);
 
@@ -90,18 +97,20 @@ public class FavoriteRestController extends BaseController implements FavoritesR
      * Creates Favorite object for saving.
      *
      */
-    private Favorites createFavorite(@Nonnull final FavoriteCreateDto request, @Nonnull final Event event) {
+    private Favorites createFavorite(@Nonnull final String userId, @Nonnull final Event event) {
         Favorites favorites = new Favorites();
+        favorites.setUserId(userId);
         favorites.setEvent(event);
-        favorites.setUserId(request.getUserId());
         return favorites;
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<DataResponse<List<AllFavoritesResponse>>> getFavoritesByUserId(@Nonnull final String userId) throws InvalidFavoriteException {
+    public ResponseEntity<DataResponse<List<AllFavoritesResponse>>> getFavorites() throws InvalidFavoriteException {
+
+		String userId = authenticationService.getId();
 
         if (StringUtils.isBlank(userId)) {
             throw new InvalidFavoriteException("The user id should not be blank.");
@@ -144,7 +153,9 @@ public class FavoriteRestController extends BaseController implements FavoritesR
     @Override
     public ResponseEntity<DataResponse<List<AllFavoritesResponse>>> removeFavorite(@Valid FavoriteCreateDto request)
             throws InvalidFavoriteException, ResourceNotFoundException {
-        if (StringUtils.isAnyBlank(request.getUserId(), request.getEventId())) {
+		String userId = authenticationService.getId();
+
+        if (StringUtils.isAnyBlank(userId, request.getEventId())) {
             throw new InvalidFavoriteException("The request is invalid.");
         }
 
@@ -153,15 +164,15 @@ public class FavoriteRestController extends BaseController implements FavoritesR
             throw new ResourceNotFoundException("The event not found  with id:" + request.getEventId());
         } else {
             Event event = eventOptional.get();
-            Optional<Favorites> favoritesOptional = this.favoriteDao.findByUserIdAndEvent(request.getUserId(), event);
+            Optional<Favorites> favoritesOptional = this.favoriteDao.findByUserIdAndEvent(userId, event);
 
             if (favoritesOptional.isEmpty()) {
-                throw new ResourceNotFoundException("The event is not on the favorite list of a user." + request.getUserId());
+                throw new ResourceNotFoundException("The event is not on the favorite list of a user." + userId);
             } else {
                 Favorites favorites = favoritesOptional.get();
                 this.favoriteDao.delete(favorites);
 
-                return getAllFavoriteDto(request.getUserId());
+                return getAllFavoriteDto(userId);
             }
 
         }

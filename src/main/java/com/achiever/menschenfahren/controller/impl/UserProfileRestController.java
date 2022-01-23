@@ -44,186 +44,182 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserProfileRestController extends BaseController implements UserProfileRestControllerInterface {
 
-    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE);
+	private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(MediaType.IMAGE_JPEG_VALUE,
+			MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE);
 
-    private final UserProfileMapper  userProfileMapper     = new UserProfileMapper();
+	private final UserProfileMapper userProfileMapper = new UserProfileMapper();
 
-    private final UserMapper         userMapper            = new UserMapper();
+	private final UserMapper userMapper = new UserMapper();
 
-    @Autowired
-    private UserProfileService       userProfileService;
+	@Autowired
+	private UserProfileService userProfileService;
 
-    @Autowired
-    private AvatarDaoInterface       avatarDao;
+	@Autowired
+	private AvatarDaoInterface avatarDao;
 
-    @Autowired
-    private UserDaoInterface         userDao;
+	@Autowired
+	private UserDaoInterface userDao;
 
-    @Autowired
-    private AuthenticationService authenticationService;
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull @Valid final UserProfileCreateDto request,
-            final boolean alsoVoided) throws InvalidUserException {
-    	String userId = authenticationService.getId();
-    	final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
-        if (user.isPresent()) {
-            final User savedUser = user.get();
-            request.setUserId(userId);
-            final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
-            // setting user to userprofile.
-            userProfile.setUser(savedUser);
+	@Autowired
+	private AuthenticationService authenticationService;
 
-            final UserProfile savedUserProfile = this.userProfileService.addProfile(userProfile, alsoVoided);
-            final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
-            if (userProfileDto != null) {
-                userProfileDto.setUserId(savedUser.getId());
-                UserDto userDto = this.userMapper.map(savedUser, UserDto.class);
-                userProfileDto.setUser(userDto);
-            }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ResponseEntity<DataResponse<UserProfileDto>> createProfile(
+			@Nonnull @Valid final UserProfileCreateDto request, final boolean alsoVoided) throws InvalidUserException {
+		String userId = authenticationService.getId();
+		final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
+		if (user.isPresent()) {
+			final User savedUser = user.get();
+			request.setUserId(userId);
+			final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
+			// setting user to userprofile.
+			userProfile.setUser(savedUser);
 
-            if (userProfileDto != null) {
-                return buildResponse(userProfileDto, HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-        } else {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+			final UserProfile savedUserProfile = this.userProfileService.addProfile(userProfile, alsoVoided);
+			final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
+			if (userProfileDto != null) {
+				userProfileDto.setUserId(savedUser.getId());
+				UserDto userDto = this.userMapper.map(savedUser, UserDto.class);
+				userProfileDto.setUser(userDto);
+			}
 
-    }
+			if (userProfileDto != null) {
+				return buildResponse(userProfileDto, HttpStatus.CREATED);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
-    	final UserProfile userProfile = this.findUserProfileById(id);
-        final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
-        return buildResponse(savedUserProfileDto, HttpStatus.OK);
+	}
 
-    }
+	/**
+	 * {@inheritDoc}
+	 * @throws MultipleResourceFoundException 
+	 */
+	@Override
+	public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(@Nonnull final String userId, final boolean alsoVoided)
+			throws ResourceNotFoundException, MultipleResourceFoundException {
+		final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
 
-    @Override
-    public ResponseEntity<DataResponse<UserProfileDto>> getUserProfileByUserId(final boolean alsoVoided)
-            throws ResourceNotFoundException, MultipleResourceFoundException {
-    	String userId = authenticationService.getId();
-        final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
+		if (user.isPresent()) {
+			User savedUser = user.get();
+			final UserProfile userProfile = userProfileService.findByUser(savedUser);
+			final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
+			savedUserProfileDto.setUserId(savedUser.getId());
+			return buildResponse(savedUserProfileDto, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 
-        if (user.isPresent()) {
-            User savedUser = user.get();
-            final UserProfile userProfile = this.findUserProfileByUser(savedUser);
-            final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
-            savedUserProfileDto.setUserId(savedUser.getId());
-            return buildResponse(savedUserProfileDto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+	}
 
-    }
+	@Override
+	public ResponseEntity<DataResponse<UserProfileDto>> getProfileByToken(final boolean alsoVoided)
+			throws ResourceNotFoundException, MultipleResourceFoundException {
+		String userId = authenticationService.getId();
+		final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<DataResponse<UserProfileDto>> editProfile(@Nonnull final String userProfileId, @Valid final UserProfileEditDto request)
-            throws ResourceNotFoundException {
-        final UserProfile userProfile = findUserProfileById(userProfileId);
-        userProfileMapper.map(request, userProfile);
+		if (user.isPresent()) {
+			User savedUser = user.get();
+			final UserProfile userProfile = userProfileService.findByUser(savedUser);
+			final UserProfileDto savedUserProfileDto = this.userProfileMapper.map(userProfile, UserProfileDto.class);
+			savedUserProfileDto.setUserId(savedUser.getId());
+			return buildResponse(savedUserProfileDto, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
 
-        final UserProfile savedUserProfile = userProfileService.addProfile(userProfile, userProfile.isVoided());
-        return buildResponse(userProfileMapper.map(savedUserProfile, UserProfileDto.class), HttpStatus.OK);
-    }
+	}
 
-    /**
-     * Find User profile by the id.
-     *
-     * @param id
-     *            The identifier of user profile.
-     * @return User profile
-     * @throws ResourceNotFoundException
-     *             Thrown if the resource is not found.
-     */
-    private UserProfile findUserProfileById(@Nonnull final String id) throws ResourceNotFoundException {
-        final Optional<UserProfile> userProfileOptional = this.userProfileService.findById(id);
-        if (userProfileOptional.isEmpty()) {
-            throw new ResourceNotFoundException("No User profile found with id:" + id);
-        }
-        final UserProfile userProfile = userProfileOptional.get();
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @throws MultipleResourceFoundException
+	 */
+	@Override
+	public ResponseEntity<DataResponse<UserProfileDto>> editProfile(@Valid final UserProfileEditDto request)
+			throws ResourceNotFoundException, MultipleResourceFoundException {
+		String userId = authenticationService.getId();
+		final Optional<User> user = this.userDao.findById(userId);
+		if (user.isPresent()) {
+			User savedUser = user.get();
+			UserProfile userProfile;
+			userProfile = userProfileService.findByUser(savedUser);
+			userProfileMapper.map(request, userProfile);
+			final UserProfile savedUserProfile = userProfileService.addProfile(userProfile, userProfile.isVoided());
+			return buildResponse(userProfileMapper.map(savedUserProfile, UserProfileDto.class), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+	}
 
-        return userProfile;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ResponseEntity<String> updateUserPicture(@Nonnull final MultipartFile avatar) {
+		String userId = authenticationService.getId();
 
-    private UserProfile findUserProfileByUser(@Nonnull final User user) throws ResourceNotFoundException, MultipleResourceFoundException {
-        final UserProfile userProfile = this.userProfileService.findByUser(user);
-        return userProfile;
-    }
+		final var contentType = avatar.getContentType();
+		if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
+			return ResponseEntity.badRequest().body("Invalid image type. Only allowed: " + ALLOWED_CONTENT_TYPES);
+		}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<String> updateUserPicture(@Nonnull final MultipartFile avatar) {
-    	String userId = authenticationService.getId();
+		try {
 
-        final var contentType = avatar.getContentType();
-        if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
-            return ResponseEntity.badRequest().body("Invalid image type. Only allowed: " + ALLOWED_CONTENT_TYPES);
-        }
+			final Optional<Avatar> savedAvatarOptional = this.avatarDao.findByUserId(userId);
 
-        try {
+			if (savedAvatarOptional.isPresent() && null != savedAvatarOptional.get().getAvatar()) {
+				Avatar savedAvatar = savedAvatarOptional.get();
+				savedAvatar.setAvatar(avatar.getBytes());
+				savedAvatar.setAvatarType(contentType);
+				savedAvatar.setModifiedTimestamp(new Date());
+				this.avatarDao.save(savedAvatar);
+				log.info("Updated avatar for account {}.", userId);
+			} else {
+				final var avatarBytes = avatar.getBytes();
+				final var avatarData = new Avatar();
+				avatarData.setAvatar(avatarBytes);
+				avatarData.setAvatarType(contentType);
+				avatarData.setUserId(userId);
 
-            final Optional<Avatar> savedAvatarOptional = this.avatarDao.findByUserId(userId);
+				this.avatarDao.save(avatarData);
+				log.info("Saved avatar for account {}.", userId);
+			}
 
-            if (savedAvatarOptional.isPresent() && null != savedAvatarOptional.get().getAvatar()) {
-                Avatar savedAvatar = savedAvatarOptional.get();
-                savedAvatar.setAvatar(avatar.getBytes());
-                savedAvatar.setAvatarType(contentType);
-                savedAvatar.setModifiedTimestamp(new Date());
-                this.avatarDao.save(savedAvatar);
-                log.info("Updated avatar for account {}.", userId);
-            } else {
-                final var avatarBytes = avatar.getBytes();
-                final var avatarData = new Avatar();
-                avatarData.setAvatar(avatarBytes);
-                avatarData.setAvatarType(contentType);
-                avatarData.setUserId(userId);
+		} catch (final IOException e) {
+			return ResponseEntity.badRequest().body("Could not update avatar: " + e.getMessage());
+		}
 
-                this.avatarDao.save(avatarData);
-                log.info("Saved avatar for account {}.", userId);
-            }
+		return ResponseEntity.ok("Updated your avatar.");
+	}
 
-        } catch (final IOException e) {
-            return ResponseEntity.badRequest().body("Could not update avatar: " + e.getMessage());
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ResponseEntity<byte[]> getAvatar() {
+		String userId = authenticationService.getId();
+		final Optional<Avatar> avatar = this.avatarDao.findByUserId(userId);
+		if (avatar.isPresent() && null != avatar.get().getAvatar()) {
+			final var mediaType = avatar.get().getAvatarType();
+			MediaType responseMediaType;
+			try {
+				responseMediaType = MediaType.valueOf(mediaType);
+			} catch (final InvalidMediaTypeException e) {
+				log.warn("Invalid media type.{}", mediaType);
+				responseMediaType = MediaType.APPLICATION_OCTET_STREAM;
+			}
 
-        return ResponseEntity.ok("Updated your avatar.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<byte[]> getAvatar() {
-    	String userId = authenticationService.getId();
-        final Optional<Avatar> avatar = this.avatarDao.findByUserId(userId);
-        if (avatar.isPresent() && null != avatar.get().getAvatar()) {
-            final var mediaType = avatar.get().getAvatarType();
-            MediaType responseMediaType;
-            try {
-                responseMediaType = MediaType.valueOf(mediaType);
-            } catch (final InvalidMediaTypeException e) {
-                log.warn("Invalid media type.{}", mediaType);
-                responseMediaType = MediaType.APPLICATION_OCTET_STREAM;
-            }
-
-            return ResponseEntity.ok().contentType(responseMediaType).body(avatar.get().getAvatar());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+			return ResponseEntity.ok().contentType(responseMediaType).body(avatar.get().getAvatar());
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 
 }

@@ -114,11 +114,11 @@ public class UserRestController extends BaseController implements UserRestContro
     }
 
     @Override
-    public ResponseEntity<DataResponse<UserDto>> editUser(@Valid @Nonnull final UserEditDto request)
+    public ResponseEntity<DataResponse<UserDto>> editUser(@Valid @Nonnull final UserEditDto request, final boolean alsoVoided)
             throws ResourceNotFoundException {
 		String userId = authenticationService.getId();
 
-        Optional<User> userOptional = this.userDao.findById(userId);
+        Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException("The user id doesn't exist in our system.");
         } else {
@@ -150,9 +150,30 @@ public class UserRestController extends BaseController implements UserRestContro
         }
         return users;
     }
+    
+    @Override
+    public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(@Nonnull final String userId) throws ResourceNotFoundException {
+        final Optional<User> userOptional = this.userDao.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException("User not found for an id: " + userId);
+        }
+
+        User user = userOptional.get();
+
+        Set<String> friendList = user.getFriends();
+        List<User> userFriends = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(friendList)) {
+            userFriends = userDao.findAllById(friendList);
+        }
+
+        List<FriendsDto> result = userMapper.mapAsList(userFriends, FriendsDto.class);
+
+        return buildResponse(result, HttpStatus.OK);
+    }
 
     @Override
-    public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList() throws ResourceNotFoundException {
+    public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendListByToken() throws ResourceNotFoundException {
 		String userId = authenticationService.getId();
 
         Optional<User> userOptional = userDao.findById(userId);

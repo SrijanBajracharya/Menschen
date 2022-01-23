@@ -73,9 +73,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // dont authenticate this particular request
                 .authorizeRequests()
                 .antMatchers("/swagger-ui/**", 
+                		"/api-docs/**",
                 		Constants.SERVICE_EVENT_API + "/authenticate", 
                 		Constants.SERVICE_EVENT_API + "/user",
-                		Constants.SERVICE_EVENT_API + "**")
+                		Constants.SERVICE_EVENT_API + "/events")
                 .permitAll()
                 // all other requests need to be authenticated
                 .anyRequest()

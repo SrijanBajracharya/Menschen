@@ -66,6 +66,8 @@ public interface UserDaoInterface extends JpaRepository<User, String> {
 
     Optional<User> findByIdAndVoided(@Nonnull final String userId, final boolean alsoVoided);
 
+    Optional<User> findById(@Nonnull final String userId);
+
     // boolean findUserProfileExistsByUserId(@Nonnull final Long userId);
 
 }

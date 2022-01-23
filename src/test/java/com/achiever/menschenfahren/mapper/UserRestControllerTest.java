@@ -154,7 +154,7 @@ public class UserRestControllerTest {
 
     @Test
     public void testGetUserProfile() throws Exception {
-        final var response = restProfileController.getUserProfileById(userProfileId);
+        final var response = restProfileController.getUserProfileByUserId(userProfileId, false);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -162,7 +162,7 @@ public class UserRestControllerTest {
 
     // @Test
     public void testCreateProfile() throws Exception {
-        final var response = restProfileController.createProfile(userId, buildCreateProfileDto(), false);
+        final var response = restProfileController.createProfile(buildCreateProfileDto(), false);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNull(response.getBody());

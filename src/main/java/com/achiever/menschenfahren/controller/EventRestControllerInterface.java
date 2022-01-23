@@ -67,14 +67,17 @@ public interface EventRestControllerInterface {
      * @return
      */
     @Operation(description = "Returns the event  with the given eventId.")
-    @Parameters(value = { @Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided events are also considered and returned.") })
+    @Parameters(value = { 
+			@Parameter(name = CommonConstants.Params.EVENT_ID, description = "An identifier for an event"),
+			@Parameter(name = CommonConstants.Params.ALSO_PRIVATE, description = "Boolean to/not to consider Private events "),
+    		@Parameter(name = CommonConstants.Params.ALSO_VOIDED, description = "If voided events are also considered and returned.") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found the Event", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
             @ApiResponse(responseCode = "400", description = "The event details is incomplete"),
             @ApiResponse(responseCode = "410", description = "The event has been voided"),
             @ApiResponse(responseCode = "404", description = "No Event found with the eventId") })
-    @GetMapping("event/{eventId}")
+    @GetMapping("events/{eventId}")
     ResponseEntity<DataResponse<EventDto>> getEvent(@PathVariable(name = "eventId", required = true) @Nonnull final String eventId,
             @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided,
             @RequestParam(name = CommonConstants.Params.ALSO_PRIVATE, defaultValue = "false", required = false) final boolean alsoPrivate)
@@ -116,9 +119,8 @@ public interface EventRestControllerInterface {
             @ApiResponse(responseCode = "400", description = "Returned if the event data contained invalid field"),
             @ApiResponse(responseCode = "410", description = "The event has been voided"),
             @ApiResponse(responseCode = "204", description = "Found no visible Event", content = @Content()) })
-    @GetMapping("events/{userId}")
-    ResponseEntity<DataResponse<List<EventDto>>> getEventsByUserId(@PathVariable(name = "userId", required = true) @Nonnull final String userId,
-            @RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
+    @GetMapping("events/user")
+    ResponseEntity<DataResponse<List<EventDto>>> getUserEvents(@RequestParam(name = CommonConstants.Params.ALSO_VOIDED, defaultValue = "false", required = false) final boolean alsoVoided)
             throws InvalidEventException;
 
     /**
@@ -129,6 +131,9 @@ public interface EventRestControllerInterface {
      * @return The updated Event.
      */
     @Operation(description = "Makes event private and Returns the event.")
+    @Parameters(value = { 
+			@Parameter(name = CommonConstants.Params.EVENT_ID, description = "An identifier for an event")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Event successfully made private.", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
@@ -147,6 +152,9 @@ public interface EventRestControllerInterface {
      * @return The updated Event.
      */
     @Operation(description = "Makes event public and Returns the event.")
+    @Parameters(value = { 
+			@Parameter(name = CommonConstants.Params.EVENT_ID, description = "An identifier for an event")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Event successfully made public.", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
@@ -169,8 +177,9 @@ public interface EventRestControllerInterface {
      *             If the referenced Id wasn't found. Will be returned as code 404.
      */
     @Operation(description = "Updates an exisiting Event.")
-    @Parameters(value = { @Parameter(name = "request", description = "The fields as request body that can be changed during a basic edit operation"),
-            @Parameter(name = CommonConstants.Params.EVENT_ID, description = "The id of the event as part of the path.") })
+    @Parameters(value = { 
+			@Parameter(name = CommonConstants.Params.EVENT_ID, description = "An identifier for an event")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Event was successfully edited", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
@@ -185,7 +194,7 @@ public interface EventRestControllerInterface {
             @ApiResponse(responseCode = "200", description = "Event successfully filtered.", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EventDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Returned if the event data contained invalid field") })
-    @PostMapping("filter")
+    @PostMapping("events/filter")
     ResponseEntity<DataResponse<List<EventDto>>> filterEvent(@RequestBody(required = true) @Valid final FilterCreateDto request)
             throws InvalidEventException, InvalidEventTypeException;
 }

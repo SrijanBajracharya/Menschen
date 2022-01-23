@@ -22,6 +22,7 @@ import com.achiever.menschenfahren.dao.FeedbackDaoInterface;
 import com.achiever.menschenfahren.entities.feedback.Feedback;
 import com.achiever.menschenfahren.exception.InvalidFeedbackException;
 import com.achiever.menschenfahren.mapper.FeedbackMapper;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 /**
  * Controller for handling all functionality related to feedback feature.
@@ -36,6 +37,9 @@ public class FeedbackRestController extends BaseController implements FeedbackRe
     private final FeedbackDaoInterface feedbackDao;
 
     private final FeedbackMapper       feedbackMapper;
+    
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Autowired
     public FeedbackRestController(@Nonnull final FeedbackDaoInterface feedbackDao) {
@@ -49,7 +53,9 @@ public class FeedbackRestController extends BaseController implements FeedbackRe
     @Override
     public ResponseEntity<DataResponse<FeedbackDto>> CreateFeedback(@Nonnull final @Valid FeedbackCreateDto request) throws InvalidFeedbackException {
 
-        if (StringUtils.isAnyBlank(request.getUserId(), request.getSubject(), request.getDescription())) {
+		String userId = authenticationService.getId();
+
+        if (StringUtils.isAnyBlank(userId, request.getSubject(), request.getDescription())) {
             throw new InvalidFeedbackException("The input data is invalid");
         }
 

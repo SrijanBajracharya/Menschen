@@ -33,7 +33,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @Entity(name = "users")
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "email", "username" }) })
 @EqualsAndHashCode(callSuper = true)
 public class User extends AbstractBaseEntity {
 

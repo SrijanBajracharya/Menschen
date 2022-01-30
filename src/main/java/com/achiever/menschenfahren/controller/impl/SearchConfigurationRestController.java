@@ -24,6 +24,7 @@ import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.exception.InvalidSearchConfigException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.SearchConfigMapper;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +38,9 @@ public class SearchConfigurationRestController extends BaseController implements
     private final UserDaoInterface         userDao;
 
     private final SearchConfigDaoInterface searchConfigDao;
+    
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Autowired
     public SearchConfigurationRestController(@Nonnull final UserDaoInterface userDao, @Nonnull final SearchConfigDaoInterface searchConfigDao) {
@@ -48,19 +52,23 @@ public class SearchConfigurationRestController extends BaseController implements
     @Override
     public ResponseEntity<DataResponse<SearchConfigResponseDto>> createSearchConfig(@Nonnull @Valid final SearchConfigCreateDto request)
             throws InvalidSearchConfigException, ResourceNotFoundException {
+		String userId = authenticationService.getId();
 
-        if (StringUtils.isBlank(request.getUserId())) {
+        if (StringUtils.isBlank(userId)) {
             log.error("The id of user should not be empty.");
             throw new InvalidSearchConfigException("The user id should not be empty.");
         }
 
-        Optional<User> userOptional = this.userDao.findById(request.getUserId());
+        Optional<User> userOptional = this.userDao.findById(userId);
 
         if (userOptional.get() == null) {
             log.error("The user not found with id :  {}", request.getUserId());
             throw new ResourceNotFoundException("The user not found with id:" + request.getUserId());
         }
 
+        // set from token
+        request.setUserId(userId);
+        
         SearchConfiguration searchConfiguration = this.searchConfigMapper.map(request, SearchConfiguration.class);
 
         SearchConfiguration savedSearchConfig = this.searchConfigDao.save(searchConfiguration);

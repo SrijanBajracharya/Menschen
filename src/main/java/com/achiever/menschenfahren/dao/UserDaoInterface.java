@@ -37,6 +37,16 @@ public interface UserDaoInterface extends JpaRepository<User, String> {
      * @return The user which matches email.
      */
     User findByEmail(@NonNull final String email);
+    
+    
+    /**
+     * /** Checks if the username already already or not, if the email exists throws exception, if no result found then null is returned.
+     *
+     * @param username:
+     *            The username of the user.
+     * @return The user which matches email.
+     */
+    User findByUsername(@NonNull final String username);
 
     /**
      * Deactivates user. Find {@link User} by uuid, if user exists then deactivates user.
@@ -55,6 +65,8 @@ public interface UserDaoInterface extends JpaRepository<User, String> {
     List<User> findByVoided(final boolean alsoVoided);
 
     Optional<User> findByIdAndVoided(@Nonnull final String userId, final boolean alsoVoided);
+
+    Optional<User> findById(@Nonnull final String userId);
 
     // boolean findUserProfileExistsByUserId(@Nonnull final Long userId);
 

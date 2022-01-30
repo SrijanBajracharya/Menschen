@@ -28,6 +28,7 @@ import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
 import com.achiever.menschenfahren.service.UserProfileService;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
@@ -53,6 +54,9 @@ public class UserProfileRestControllerTest {
 
     @MockBean
     private UserDaoInterface          userDao;
+    
+    @MockBean
+    private AuthenticationService authenticationService;
 
     @BeforeAll
     protected static void initialize() {
@@ -116,7 +120,7 @@ public class UserProfileRestControllerTest {
 
     // @Test
     public void testGetUsers() throws Exception {
-        final var response = restController.getUserProfileById("non-existing");
+        final var response = restController.getUserProfileByUserId("non-existing", false);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
@@ -124,8 +128,9 @@ public class UserProfileRestControllerTest {
 
     // @Test
     public void testCreateProfile() throws Exception {
-        final var response = restController.createProfile(userId, buildCreateDto(), false);
+        final var response = restController.createProfile(buildCreateDto(), false);
 
+        Mockito.when(authenticationService.getId()).thenReturn("1");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
     }

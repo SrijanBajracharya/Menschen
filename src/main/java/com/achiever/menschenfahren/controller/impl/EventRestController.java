@@ -31,6 +31,7 @@ import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.service.EventService;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +56,9 @@ public class EventRestController extends BaseController implements EventRestCont
 
     @Autowired
     private FilterEventDaoInterface filterEventDao;
+    
+    @Autowired
+    private AuthenticationService authenticationService;
 
     private final EventMapper       eventMapper = new EventMapper();
 
@@ -110,8 +114,9 @@ public class EventRestController extends BaseController implements EventRestCont
     @Override
     public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request)
             throws InvalidEventException, InvalidEventTypeException {
+		String userId = authenticationService.getId();
 
-        final Optional<User> user = this.userDao.findById(request.getUserId());
+        final Optional<User> user = this.userDao.findById(userId);
 
         if (user.isPresent()) {
             final User foundUser = user.get();
@@ -144,13 +149,14 @@ public class EventRestController extends BaseController implements EventRestCont
         }
 
     }
-
+    
     /**
-     * Gets all the events based on the userId
+     * Gets all the events based on token
      */
     @Override
-    public ResponseEntity<DataResponse<List<EventDto>>> getEventsByUserId(@Nonnull final String userId, final boolean alsoVoided) throws InvalidEventException {
-        final List<Event> events = this.eventService.getEventsByUserId(userId, alsoVoided);
+    public ResponseEntity<DataResponse<List<EventDto>>> getUserEvents(final boolean alsoVoided) throws InvalidEventException {
+		String userId = authenticationService.getId();
+    	final List<Event> events = this.eventService.getEventsByUserId(userId, alsoVoided);
 
         final List<EventDto> myEvents = new ArrayList<>();
 

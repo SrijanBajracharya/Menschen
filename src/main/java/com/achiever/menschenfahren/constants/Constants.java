@@ -21,6 +21,12 @@ public class Constants {
 
         /** Claim for setting the issuer of the token. **/
         public static final String CLAIM_ISSUER   = "com.achiever.menschenfahren";
+        
+        /** Claim for the identifier **/
+        public static final String CLAIM_INDENTIFIER   = "identifier";
+        
+        public static final String TOKEN_TYPE   = "Bearer";
+
     }
 
     public class ROLE {

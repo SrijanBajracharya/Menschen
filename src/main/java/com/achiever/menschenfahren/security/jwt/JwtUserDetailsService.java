@@ -42,7 +42,12 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (daoUser == null) {
             throw new EmailNotFoundException("User not found with email: " + user.getEmail());
         }
-        return new ExtendedUserDetails(daoUser.getUsername(), daoUser.getEmail(), daoUser.getPassword(), new ArrayList<>());
+        return new ExtendedUserDetails(
+        		daoUser.getUsername(), 
+        		daoUser.getEmail(), 
+        		daoUser.getPassword(), 
+        		daoUser.getId(), 
+        	new ArrayList<>());
     }
 
 }

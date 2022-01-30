@@ -8,15 +8,10 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
-import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,17 +22,15 @@ import com.achiever.menschenfahren.base.dto.request.JwtRequest;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
-import com.achiever.menschenfahren.base.dto.response.JwtResponse;
 import com.achiever.menschenfahren.base.dto.response.UserDto;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.EmailNotFoundException;
 import com.achiever.menschenfahren.exception.InvalidUserException;
 import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
-import com.achiever.menschenfahren.security.jwt.JwtTokenUtil;
+import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
 /**
  *
@@ -53,18 +46,15 @@ public class UserRestController extends BaseController implements UserRestContro
     @Autowired
     private UserDaoInterface            userDao;
 
-    private final AuthenticationManager authenticationManager;
-
-    private final JwtTokenUtil          jwtTokenUtil;
-
     @Autowired
     private PasswordEncoder             bcryptEncoder;
+    
+    @Autowired
+    private AuthenticationService authenticationService;
 
-    public UserRestController(@Nonnull final AuthenticationManager authenticationManager, @Nonnull final JwtTokenUtil jwtTokenUtil) {
+    public UserRestController() {
         super();
         this.userMapper = new UserMapper();
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     /**
@@ -124,9 +114,11 @@ public class UserRestController extends BaseController implements UserRestContro
     }
 
     @Override
-    public ResponseEntity<DataResponse<UserDto>> editUser(@Nonnull final String userId, @Valid @Nonnull final UserEditDto request)
+    public ResponseEntity<DataResponse<UserDto>> editUser(@Valid @Nonnull final UserEditDto request, final boolean alsoVoided)
             throws ResourceNotFoundException {
-        Optional<User> userOptional = this.userDao.findById(userId);
+		String userId = authenticationService.getId();
+
+        Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException("The user id doesn't exist in our system.");
         } else {
@@ -158,9 +150,31 @@ public class UserRestController extends BaseController implements UserRestContro
         }
         return users;
     }
-
+    
     @Override
     public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(@Nonnull final String userId) throws ResourceNotFoundException {
+        final Optional<User> userOptional = this.userDao.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException("User not found for an id: " + userId);
+        }
+
+        User user = userOptional.get();
+
+        Set<String> friendList = user.getFriends();
+        List<User> userFriends = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(friendList)) {
+            userFriends = userDao.findAllById(friendList);
+        }
+
+        List<FriendsDto> result = userMapper.mapAsList(userFriends, FriendsDto.class);
+
+        return buildResponse(result, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendListByToken() throws ResourceNotFoundException {
+		String userId = authenticationService.getId();
 
         Optional<User> userOptional = userDao.findById(userId);
         if (userOptional.isEmpty()) {
@@ -182,27 +196,24 @@ public class UserRestController extends BaseController implements UserRestContro
 
     @Override
     public ResponseEntity<?> createAuthenticationToken(JwtRequest authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
-        final User user = userDao.findByEmail(authenticationRequest.getEmail());
-
-        if (user == null) {
-            throw new EmailNotFoundException("User email not found.");
-        }
-
-        final String token = jwtTokenUtil.generateToken(user);
-
-        return ResponseEntity.ok(new JwtResponse(token));
+        return buildResponse(authenticationService.authenticate(authenticationRequest), HttpStatus.OK);
     }
 
-    private void authenticate(String username, String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new DisabledException("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new InvalidCredentialsException("INVALID_CREDENTIALS", e);
+	public ResponseEntity<DataResponse<UserDto>> getUserByToken(boolean alsoVoided) throws InvalidUserException {
+		String userId = authenticationService.getId();
+		final Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
+        if (!userOptional.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            final User user = userOptional.get();
+            final UserDto userDto = this.userMapper.map(user, UserDto.class);
+
+            if (userDto != null) {
+                return buildResponse(userDto, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.GONE);
+            }
         }
-    }
+	}
 
 }

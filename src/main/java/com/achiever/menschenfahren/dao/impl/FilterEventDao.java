@@ -45,7 +45,7 @@ public class FilterEventDao implements FilterEventDaoInterface {
         List<Predicate> predicates = new ArrayList<>();
 
         if (StringUtils.isNotBlank(request.getCountryId())) {
-            Predicate hasCountryName = cb.equal(event.get(Event_.countryCode), request.getCountryId());
+            Predicate hasCountryName = cb.equal(event.get(Event_.country), request.getCountryId());
             predicates.add(hasCountryName);
         }
 

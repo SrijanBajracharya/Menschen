@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.entities.events.EventType;
-import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 
 public interface EventTypeService {
 

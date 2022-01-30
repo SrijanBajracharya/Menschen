@@ -16,21 +16,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.controller.NotificationRestControllerInterface;
 import com.achiever.menschenfahren.base.dto.request.NotificationCreateDto;
 import com.achiever.menschenfahren.base.dto.request.NotificationEditDto;
 import com.achiever.menschenfahren.base.dto.request.NotificationInviteDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.NotificationDto;
+import com.achiever.menschenfahren.base.exception.InvalidNotificationException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.base.model.NotificationStatus;
 import com.achiever.menschenfahren.base.model.NotificationType;
 import com.achiever.menschenfahren.constants.Constants;
-import com.achiever.menschenfahren.controller.NotificationRestControllerInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.notification.Notification;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.InvalidNotificationException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.NotificationMapper;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.NotificationService;
@@ -56,9 +56,9 @@ public class NotificationRestController extends BaseController implements Notifi
     private final NotificationMapper  notificationMapper;
 
     private final EventService        eventService;
-    
+
     @Autowired
-    private AuthenticationService authenticationService;
+    private AuthenticationService     authenticationService;
 
     @Autowired
     public NotificationRestController(@Nonnull final NotificationService notificationService, @Nonnull final UserDaoInterface userDao,
@@ -79,8 +79,7 @@ public class NotificationRestController extends BaseController implements Notifi
     @Override
     public ResponseEntity<DataResponse<NotificationDto>> createJoinRequest(@Nonnull @Valid final NotificationCreateDto request, final boolean alsoVoided)
             throws ResourceNotFoundException, InvalidNotificationException {
-		String userId = authenticationService.getId();
-
+        String userId = authenticationService.getId();
 
         if (StringUtils.isAnyBlank(userId, request.getOriginalReceiverId(), request.getEventId())) {
             throw new InvalidNotificationException("The id of sender, receiver and event should be filled.");
@@ -112,9 +111,8 @@ public class NotificationRestController extends BaseController implements Notifi
     public ResponseEntity<DataResponse<NotificationDto>> updateNotification(@Nonnull final String notificationId, @Nonnull final String originalSenderId,
             @Valid NotificationEditDto request) throws ResourceNotFoundException, InvalidNotificationException {
 
-    	
-    	// original receiver is taken from the token
-		String originalReceiverId = authenticationService.getId();
+        // original receiver is taken from the token
+        String originalReceiverId = authenticationService.getId();
 
         Optional<Notification> notificationOptional = this.notificationService.findById(notificationId);
 
@@ -148,9 +146,8 @@ public class NotificationRestController extends BaseController implements Notifi
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<DataResponse<List<NotificationDto>>> ggetNotificationByToken(final boolean alsoVoided)
-            throws InvalidNotificationException {
-		String userId = authenticationService.getId();
+    public ResponseEntity<DataResponse<List<NotificationDto>>> ggetNotificationByToken(final boolean alsoVoided) throws InvalidNotificationException {
+        String userId = authenticationService.getId();
 
         List<Notification> receivedNotification = this.notificationService.findByOriginalReceiverId(userId, alsoVoided);
         List<Notification> senderNotification = this.notificationService.findByOriginalSenderId(userId, alsoVoided);
@@ -183,7 +180,7 @@ public class NotificationRestController extends BaseController implements Notifi
     @Override
     public ResponseEntity<DataResponse<NotificationDto>> createInviteRequest(@Nonnull final NotificationInviteDto request)
             throws ResourceNotFoundException, InvalidNotificationException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         if (StringUtils.isAnyBlank(userId, request.getEventId(), request.getReceiverEmailId())) {
             throw new InvalidNotificationException("The id of sender, email id of receiver and event id should be filled.");
@@ -201,8 +198,8 @@ public class NotificationRestController extends BaseController implements Notifi
         }
         // Check if the invite has already been sent for the given user.
 
-        Notification existedNotification = this.notificationService.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(userId,
-                receiverUser.getId(), request.getEventId());
+        Notification existedNotification = this.notificationService.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(userId, receiverUser.getId(),
+                request.getEventId());
 
         if (existedNotification != null && existedNotification.getNotificationType().equals(NotificationType.INVITE)) {
             log.info("The request has already been sent to the user.");
@@ -237,7 +234,7 @@ public class NotificationRestController extends BaseController implements Notifi
      */
     private Notification createInviteNotification(@Nonnull final User receiverUser, @Nonnull final NotificationInviteDto request)
             throws InvalidNotificationException, ResourceNotFoundException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         Notification notification = new Notification();
         Optional<Event> savedEvent = this.eventService.findById(request.getEventId());
@@ -272,7 +269,7 @@ public class NotificationRestController extends BaseController implements Notifi
 
     private Notification createJoinNotification(@Nonnull final NotificationCreateDto request, final boolean alsoVoided)
             throws InvalidNotificationException, ResourceNotFoundException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         Notification notification = new Notification();
         Optional<Event> savedEvent = this.eventService.findById(request.getEventId());

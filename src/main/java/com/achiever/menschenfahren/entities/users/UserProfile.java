@@ -48,33 +48,39 @@ public class UserProfile extends AbstractBaseEntity {
 
     @OneToOne(targetEntity = Avatar.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "avatar_id", referencedColumnName = "user_id")
+    @Nullable
     private Avatar     avatar;
 
     @OneToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private List<Role> roleId;
 
-    @Column(name = "dob")
-    private String     dateOfBirth;
+    @Column(name = "dob", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date       dateOfBirth;
 
     @Column(name = "terms_and_agreement")
     private boolean    termsAndAgreement = true;
 
-    @Column(name = "timezone")
-    private String     timezone;
+    @Column(name = "country")
+    @Nonnull
+    private String     country;
 
     @Column(name = "photo")
+    @Nullable
     private String     photo;
 
     @Column(name = "address")
-    @Nullable
+    @Nonnull
     private String     address;
 
     @Column(name = "gender")
     @Enumerated(EnumType.STRING)
+    @Nonnull
     private Gender     gender;
 
     @Column(name = "phone_number", length = 30)
+    @Nonnull
     private String     phoneNumber;
 
     @Column(name = "is_phone_number_valid")

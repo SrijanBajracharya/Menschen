@@ -17,18 +17,18 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.base.dto.request.FriendsDto;
 import com.achiever.menschenfahren.base.dto.request.JwtRequest;
 import com.achiever.menschenfahren.base.dto.request.UserCreateDto;
 import com.achiever.menschenfahren.base.dto.request.UserEditDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.UserDto;
+import com.achiever.menschenfahren.base.exception.InvalidUserException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.constants.Constants;
-import com.achiever.menschenfahren.controller.UserRestControllerInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.InvalidUserException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.UserMapper;
 import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
@@ -41,14 +41,14 @@ import com.achiever.menschenfahren.service.impl.AuthenticationService;
 @RequestMapping(Constants.SERVICE_EVENT_API)
 public class UserRestController extends BaseController implements UserRestControllerInterface {
 
-    private final UserMapper            userMapper;
+    private final UserMapper      userMapper;
 
     @Autowired
-    private UserDaoInterface            userDao;
+    private UserDaoInterface      userDao;
 
     @Autowired
-    private PasswordEncoder             bcryptEncoder;
-    
+    private PasswordEncoder       bcryptEncoder;
+
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -116,7 +116,7 @@ public class UserRestController extends BaseController implements UserRestContro
     @Override
     public ResponseEntity<DataResponse<UserDto>> editUser(@Valid @Nonnull final UserEditDto request, final boolean alsoVoided)
             throws ResourceNotFoundException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (userOptional.isEmpty()) {
@@ -150,7 +150,7 @@ public class UserRestController extends BaseController implements UserRestContro
         }
         return users;
     }
-    
+
     @Override
     public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendList(@Nonnull final String userId) throws ResourceNotFoundException {
         final Optional<User> userOptional = this.userDao.findById(userId);
@@ -174,7 +174,7 @@ public class UserRestController extends BaseController implements UserRestContro
 
     @Override
     public ResponseEntity<DataResponse<List<FriendsDto>>> getFriendListByToken() throws ResourceNotFoundException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         Optional<User> userOptional = userDao.findById(userId);
         if (userOptional.isEmpty()) {
@@ -199,9 +199,10 @@ public class UserRestController extends BaseController implements UserRestContro
         return buildResponse(authenticationService.authenticate(authenticationRequest), HttpStatus.OK);
     }
 
-	public ResponseEntity<DataResponse<UserDto>> getUserByToken(boolean alsoVoided) throws InvalidUserException {
-		String userId = authenticationService.getId();
-		final Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
+    @Override
+    public ResponseEntity<DataResponse<UserDto>> getUserByToken(boolean alsoVoided) throws InvalidUserException {
+        String userId = authenticationService.getId();
+        final Optional<User> userOptional = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (!userOptional.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
@@ -214,6 +215,6 @@ public class UserRestController extends BaseController implements UserRestContro
                 return new ResponseEntity<>(HttpStatus.GONE);
             }
         }
-	}
+    }
 
 }

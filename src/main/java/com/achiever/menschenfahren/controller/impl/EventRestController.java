@@ -13,22 +13,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
 import com.achiever.menschenfahren.base.dto.request.EventEditDto;
 import com.achiever.menschenfahren.base.dto.request.FilterCreateDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.EventDto;
+import com.achiever.menschenfahren.base.exception.InvalidEventException;
+import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.constants.Constants;
-import com.achiever.menschenfahren.controller.EventRestControllerInterface;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.dao.FilterEventDaoInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.InvalidEventException;
-import com.achiever.menschenfahren.exception.InvalidEventTypeException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.impl.AuthenticationService;
@@ -56,9 +56,9 @@ public class EventRestController extends BaseController implements EventRestCont
 
     @Autowired
     private FilterEventDaoInterface filterEventDao;
-    
+
     @Autowired
-    private AuthenticationService authenticationService;
+    private AuthenticationService   authenticationService;
 
     private final EventMapper       eventMapper = new EventMapper();
 
@@ -114,7 +114,7 @@ public class EventRestController extends BaseController implements EventRestCont
     @Override
     public ResponseEntity<DataResponse<EventDto>> createEvent(@Nonnull @Valid final EventCreateDto request)
             throws InvalidEventException, InvalidEventTypeException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         final Optional<User> user = this.userDao.findById(userId);
 
@@ -149,14 +149,14 @@ public class EventRestController extends BaseController implements EventRestCont
         }
 
     }
-    
+
     /**
      * Gets all the events based on token
      */
     @Override
     public ResponseEntity<DataResponse<List<EventDto>>> getUserEvents(final boolean alsoVoided) throws InvalidEventException {
-		String userId = authenticationService.getId();
-    	final List<Event> events = this.eventService.getEventsByUserId(userId, alsoVoided);
+        String userId = authenticationService.getId();
+        final List<Event> events = this.eventService.getEventsByUserId(userId, alsoVoided);
 
         final List<EventDto> myEvents = new ArrayList<>();
 
@@ -252,8 +252,7 @@ public class EventRestController extends BaseController implements EventRestCont
     }
 
     @Override
-    public ResponseEntity<DataResponse<List<EventDto>>> filterEvent(@Nonnull final @Valid FilterCreateDto request)
-            throws InvalidEventException, InvalidEventTypeException {
+    public ResponseEntity<DataResponse<List<EventDto>>> filterEvent(@Nonnull final @Valid FilterCreateDto request) {
 
         List<Event> filteredEvents = this.filterEventDao.filterEvent(request);
 

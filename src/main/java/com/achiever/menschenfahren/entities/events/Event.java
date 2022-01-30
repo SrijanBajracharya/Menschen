@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,17 +39,15 @@ public class Event extends AbstractBaseEntity {
     @Nonnull
     private String             id;
 
-    // @Nonnull
-    // private String userId;
-
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User               user;
 
-    @Column(name = "name", length = 100)
+    @Column(name = "name", length = 100, nullable = false)
+    @Nonnull
     private String             name;
 
-    @Column(name = "location")
+    @Column(name = "location", nullable = false)
     private String             location;
 
     @Column(name = "gallery")
@@ -59,25 +58,28 @@ public class Event extends AbstractBaseEntity {
     @OneToMany(targetEntity = EventRoute.class, mappedBy = "event", fetch = FetchType.LAZY)
     private List<EventRoute>   routes;
 
-    @Column(name = "country_code")
-    private String             countryCode;
+    @Column(name = "country", nullable = false)
+    private String             country;
 
     @ManyToOne(targetEntity = EventType.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "event_type_id", referencedColumnName = "id")
     private EventType          eventType;
 
-    @Column(name = "description", length = 1000)
+    @Column(name = "description", length = 1000, nullable = false)
     private String             description;
 
     @Column(name = "age_group")
+    @Nullable
     private String             ageGroup;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @Nonnull
     private Date               startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @Nonnull
     private Date               endDate;
 
     @Column(name = "number_of_participants")

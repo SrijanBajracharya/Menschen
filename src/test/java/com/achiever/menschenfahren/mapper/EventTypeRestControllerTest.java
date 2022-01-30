@@ -20,11 +20,11 @@ import org.springframework.http.HttpStatus;
 
 import com.achiever.menschenfahren.CustomBooleanStrategy;
 import com.achiever.menschenfahren.base.dto.request.EventTypeCreateDto;
+import com.achiever.menschenfahren.base.exception.InvalidEventException;
+import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.controller.impl.EventTypeController;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.entities.events.EventType;
-import com.achiever.menschenfahren.exception.InvalidEventException;
-import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.service.EventTypeService;
 
 import uk.co.jemos.podam.api.PodamFactory;

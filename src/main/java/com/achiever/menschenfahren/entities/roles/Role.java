@@ -26,23 +26,24 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class Role extends AbstractBaseEntity {
 
-	@Id
-	@Nonnull
-	private String id;
+    @Id
+    @Nonnull
+    private String id;
 
-	@Column(name = "name", length = 30)
-	@Nonnull
-	private String name;
+    @Column(name = "name", length = 30)
+    @Nonnull
+    private String name;
 
-	@Column(name = "description")
-	@Nullable
-	private String description;
+    @Column(name = "description")
+    @Nullable
+    private String description;
 
-	@Column(name = "modified_timestamp", nullable = false)
-	private Date modifiedTimestamp;
+    @Column(name = "modified_timestamp", nullable = false)
+    @Nonnull
+    private Date   modifiedTimestamp;
 
-	public Role() {
-		this.id = UUID.randomUUID().toString();
-		this.modifiedTimestamp = createdTimestamp;
-	}
+    public Role() {
+        this.id = UUID.randomUUID().toString();
+        this.modifiedTimestamp = createdTimestamp;
+    }
 }

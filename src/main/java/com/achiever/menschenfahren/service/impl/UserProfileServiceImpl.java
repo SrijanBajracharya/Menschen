@@ -6,17 +6,13 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.achiever.menschenfahren.base.dto.request.UserProfileEditDto;
-import com.achiever.menschenfahren.base.dto.response.DataResponse;
-import com.achiever.menschenfahren.base.dto.response.UserProfileDto;
+import com.achiever.menschenfahren.base.exception.MultipleResourceFoundException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.dao.UserProfileDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
-import com.achiever.menschenfahren.exception.MultipleResourceFoundException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.service.UserProfileService;
 
 @Service

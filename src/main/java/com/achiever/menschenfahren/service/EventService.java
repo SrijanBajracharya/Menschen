@@ -2,6 +2,7 @@ package com.achiever.menschenfahren.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -50,5 +51,7 @@ public interface EventService {
     Optional<Event> findById(@Nonnull final String id);
 
     Event merge(@Nonnull final Event event);
+
+    List<Event> getEventByIds(@Nonnull final Set<String> ids);
 
 }

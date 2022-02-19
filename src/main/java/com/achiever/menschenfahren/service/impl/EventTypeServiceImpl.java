@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
 import com.achiever.menschenfahren.entities.events.EventType;
-import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.service.EventTypeService;
 
 @Service

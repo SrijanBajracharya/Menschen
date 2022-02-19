@@ -27,7 +27,9 @@ public interface UserDaoInterface extends JpaRepository<User, String> {
      *            The email id of user.
      * @return True if user exists, False if user doesn't exist.
      */
-    // boolean findEmailExists(@NonNull final String email);
+    boolean existsByEmail(@NonNull final String email);
+
+    boolean existsByUsername(@NonNull final String username);
 
     /**
      * /** Checks if the email exists already or not, if the email exists throws exception, if no result found then null is returned.
@@ -37,8 +39,7 @@ public interface UserDaoInterface extends JpaRepository<User, String> {
      * @return The user which matches email.
      */
     User findByEmail(@NonNull final String email);
-    
-    
+
     /**
      * /** Checks if the username already already or not, if the email exists throws exception, if no result found then null is returned.
      *
@@ -66,6 +67,7 @@ public interface UserDaoInterface extends JpaRepository<User, String> {
 
     Optional<User> findByIdAndVoided(@Nonnull final String userId, final boolean alsoVoided);
 
+    @Override
     Optional<User> findById(@Nonnull final String userId);
 
     // boolean findUserProfileExistsByUserId(@Nonnull final Long userId);

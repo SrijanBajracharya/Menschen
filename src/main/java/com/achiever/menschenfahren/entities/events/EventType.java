@@ -36,7 +36,8 @@ public class EventType extends AbstractBaseEntity {
     @Nonnull
     private String  name;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
+    @Nonnull
     private String  description;
 
     @Column(name = "modified_timestamp", nullable = false)

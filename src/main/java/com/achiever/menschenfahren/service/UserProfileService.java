@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
+import com.achiever.menschenfahren.base.exception.MultipleResourceFoundException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.entities.users.UserProfile;
-import com.achiever.menschenfahren.exception.MultipleResourceFoundException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 
 public interface UserProfileService {
 

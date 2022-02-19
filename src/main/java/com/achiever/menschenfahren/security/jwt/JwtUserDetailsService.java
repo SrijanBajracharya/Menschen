@@ -10,9 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.achiever.menschenfahren.base.exception.EmailNotFoundException;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.EmailNotFoundException;
 import com.achiever.menschenfahren.security.model.ExtendedUserDetails;
 
 @Service
@@ -42,12 +42,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (daoUser == null) {
             throw new EmailNotFoundException("User not found with email: " + user.getEmail());
         }
-        return new ExtendedUserDetails(
-        		daoUser.getUsername(), 
-        		daoUser.getEmail(), 
-        		daoUser.getPassword(), 
-        		daoUser.getId(), 
-        	new ArrayList<>());
+        return new ExtendedUserDetails(daoUser.getUsername(), daoUser.getEmail(), daoUser.getPassword(), daoUser.getId(), new ArrayList<>());
     }
 
 }

@@ -24,6 +24,8 @@ import com.achiever.menschenfahren.CustomBooleanStrategy;
 import com.achiever.menschenfahren.base.dto.request.EventCreateDto;
 import com.achiever.menschenfahren.base.dto.request.EventEditDto;
 import com.achiever.menschenfahren.base.dto.response.EventDto;
+import com.achiever.menschenfahren.base.exception.InvalidEventException;
+import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.controller.impl.EventRestController;
 import com.achiever.menschenfahren.dao.EventDaoInterface;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
@@ -31,8 +33,6 @@ import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.InvalidEventException;
-import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.service.EventService;
 import com.achiever.menschenfahren.service.EventTypeService;
 

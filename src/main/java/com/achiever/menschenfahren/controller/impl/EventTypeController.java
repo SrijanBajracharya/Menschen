@@ -11,19 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.controller.EventTypeControllerInterface;
 import com.achiever.menschenfahren.base.dto.request.EventTypeCreateDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.EventTypeDto;
+import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.constants.Constants;
-import com.achiever.menschenfahren.controller.EventTypeControllerInterface;
 import com.achiever.menschenfahren.entities.events.EventType;
-import com.achiever.menschenfahren.exception.InvalidEventException;
-import com.achiever.menschenfahren.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.mapper.EventTypeMapper;
 import com.achiever.menschenfahren.service.EventTypeService;
 
-/**
- *
+/****
+ * 
  * @author Srijan Bajracharya
  *
  */
@@ -42,7 +41,7 @@ public class EventTypeController extends BaseController implements EventTypeCont
     }
 
     @Override
-    public ResponseEntity<DataResponse<List<EventTypeDto>>> getEventTypes(boolean alsoVoided) throws InvalidEventException {
+    public ResponseEntity<DataResponse<List<EventTypeDto>>> getEventTypes(boolean alsoVoided) {
         final List<EventType> eventTypes = this.eventTypeService.getEventTypes(alsoVoided);
         System.err.println();
 

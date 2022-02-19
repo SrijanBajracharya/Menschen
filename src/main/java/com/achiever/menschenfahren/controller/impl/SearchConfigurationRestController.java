@@ -12,17 +12,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.controller.SearchConfigurationRestControllerInterface;
 import com.achiever.menschenfahren.base.dto.request.SearchConfigCreateDto;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
 import com.achiever.menschenfahren.base.dto.response.SearchConfigResponseDto;
+import com.achiever.menschenfahren.base.exception.InvalidSearchConfigException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.constants.Constants;
-import com.achiever.menschenfahren.controller.SearchConfigurationRestControllerInterface;
 import com.achiever.menschenfahren.dao.SearchConfigDaoInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.configuration.SearchConfiguration;
 import com.achiever.menschenfahren.entities.users.User;
-import com.achiever.menschenfahren.exception.InvalidSearchConfigException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.SearchConfigMapper;
 import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
@@ -38,9 +38,9 @@ public class SearchConfigurationRestController extends BaseController implements
     private final UserDaoInterface         userDao;
 
     private final SearchConfigDaoInterface searchConfigDao;
-    
+
     @Autowired
-    private AuthenticationService authenticationService;
+    private AuthenticationService          authenticationService;
 
     @Autowired
     public SearchConfigurationRestController(@Nonnull final UserDaoInterface userDao, @Nonnull final SearchConfigDaoInterface searchConfigDao) {
@@ -52,7 +52,7 @@ public class SearchConfigurationRestController extends BaseController implements
     @Override
     public ResponseEntity<DataResponse<SearchConfigResponseDto>> createSearchConfig(@Nonnull @Valid final SearchConfigCreateDto request)
             throws InvalidSearchConfigException, ResourceNotFoundException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         if (StringUtils.isBlank(userId)) {
             log.error("The id of user should not be empty.");
@@ -68,7 +68,7 @@ public class SearchConfigurationRestController extends BaseController implements
 
         // set from token
         request.setUserId(userId);
-        
+
         SearchConfiguration searchConfiguration = this.searchConfigMapper.map(request, SearchConfiguration.class);
 
         SearchConfiguration savedSearchConfig = this.searchConfigDao.save(searchConfiguration);

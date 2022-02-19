@@ -26,7 +26,7 @@ public class SearchConfiguration extends AbstractBaseEntity {
     @Nonnull
     private String id;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     @Nonnull
     private String userId;
 

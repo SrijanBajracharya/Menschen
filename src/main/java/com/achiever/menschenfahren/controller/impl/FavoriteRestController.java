@@ -14,18 +14,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.achiever.menschenfahren.base.controller.FavoritesRestControllerInterface;
 import com.achiever.menschenfahren.base.dto.request.FavoriteCreateDto;
 import com.achiever.menschenfahren.base.dto.response.AllFavoritesResponse;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.base.dto.response.FavoritesDto;
+import com.achiever.menschenfahren.base.exception.InvalidFavoriteException;
+import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.constants.Constants;
-import com.achiever.menschenfahren.controller.FavoritesRestControllerInterface;
 import com.achiever.menschenfahren.dao.EventDaoInterface;
 import com.achiever.menschenfahren.dao.FavoritesDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.events.Favorites;
-import com.achiever.menschenfahren.exception.InvalidFavoriteException;
-import com.achiever.menschenfahren.exception.ResourceNotFoundException;
 import com.achiever.menschenfahren.mapper.FavoritesMapper;
 import com.achiever.menschenfahren.service.impl.AuthenticationService;
 
@@ -44,9 +45,9 @@ public class FavoriteRestController extends BaseController implements FavoritesR
     private final FavoritesDaoInterface favoriteDao;
 
     private final FavoritesMapper       favoritesMapper;
-    
+
     @Autowired
-    private AuthenticationService authenticationService;
+    private AuthenticationService       authenticationService;
 
     public FavoriteRestController(@Nonnull final EventDaoInterface eventDao, @Nonnull final FavoritesDaoInterface favoriteDao) {
         this.eventDao = eventDao;
@@ -61,7 +62,7 @@ public class FavoriteRestController extends BaseController implements FavoritesR
     public ResponseEntity<DataResponse<FavoritesDto>> createAndRemoveFavorite(@Nonnull final @Valid FavoriteCreateDto request)
             throws InvalidFavoriteException, ResourceNotFoundException {
 
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         if (StringUtils.isAnyBlank(userId, request.getEventId())) {
             throw new InvalidFavoriteException("The request is invalid.");
@@ -103,14 +104,14 @@ public class FavoriteRestController extends BaseController implements FavoritesR
         favorites.setEvent(event);
         return favorites;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<DataResponse<List<AllFavoritesResponse>>> getFavorites() throws InvalidFavoriteException {
 
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         if (StringUtils.isBlank(userId)) {
             throw new InvalidFavoriteException("The user id should not be blank.");
@@ -135,7 +136,8 @@ public class FavoriteRestController extends BaseController implements FavoritesR
         for (Favorites favorite : favorites) {
             AllFavoritesResponse favoriteResponseDto = this.favoritesMapper.map(favorite, AllFavoritesResponse.class);
             favoriteResponseDto.getEvent().setUserId(userId);
-            favoriteResponseDto.getEvent().setEventTypeId(favorite.getEvent().getEventType().getId());
+            getFavoritesByUser(userId, favoriteResponseDto.getEvent());
+            // favoriteResponseDto.getEvent().setEventTypeId(favorite.getEvent().getEventType().getId());
             allFavorites.add(favoriteResponseDto);
 
         }
@@ -153,7 +155,7 @@ public class FavoriteRestController extends BaseController implements FavoritesR
     @Override
     public ResponseEntity<DataResponse<List<AllFavoritesResponse>>> removeFavorite(@Valid FavoriteCreateDto request)
             throws InvalidFavoriteException, ResourceNotFoundException {
-		String userId = authenticationService.getId();
+        String userId = authenticationService.getId();
 
         if (StringUtils.isAnyBlank(userId, request.getEventId())) {
             throw new InvalidFavoriteException("The request is invalid.");
@@ -175,6 +177,15 @@ public class FavoriteRestController extends BaseController implements FavoritesR
                 return getAllFavoriteDto(userId);
             }
 
+        }
+    }
+
+    private void getFavoritesByUser(@Nonnull final String userId, @Nonnull final EventDto eventDto) {
+        List<Favorites> favorites = this.favoriteDao.findByUserId(userId);
+        for (Favorites fav : favorites) {
+            if (fav.getEvent().getId().equals(eventDto.getId())) {
+                eventDto.setFavorite(true);
+            }
         }
     }
 

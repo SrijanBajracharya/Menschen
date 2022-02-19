@@ -26,13 +26,14 @@ public class Feedback extends AbstractBaseEntity {
     private String id;
 
     @Nonnull
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "subject", length = 100)
+    @Column(name = "subject", length = 100, nullable = false)
     @Nonnull
     private String subject;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     @Nonnull
     private String description;
 

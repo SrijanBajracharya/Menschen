@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -20,6 +21,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import com.achiever.menschenfahren.base.model.AppRole;
 import com.achiever.menschenfahren.base.model.AuthProviderType;
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 
@@ -49,16 +51,21 @@ public class User extends AbstractBaseEntity {
     @Nonnull
     private String           lastName;
 
-    @Column(name = "email", length = 50)
+    @Column(name = "email", length = 50, unique = true, nullable = false)
     @Nonnull
     private String           email;
 
-    @Column(name = "username", length = 50)
+    @Column(name = "username", length = 50, unique = true, nullable = false)
+    @Nonnull
     private String           username;
 
     @Column(name = "password", length = 600)
     @Nonnull
     private String           password;
+
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AppRole          role;
 
     @Column(name = "auth_provider")
     @Enumerated(EnumType.STRING)
@@ -76,6 +83,7 @@ public class User extends AbstractBaseEntity {
 
     @Column(name = "deactivated_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
+    @Nullable
     private Date             deactivatedTimestamp;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -90,8 +98,7 @@ public class User extends AbstractBaseEntity {
         this.modifiedTimestamp = createdTimestamp;
         this.isActive = true;
         this.voided = false;
-        // this.authenticationType = AuthProviderType.OTHER;
-        // this.deactivatedTimestamp = null;
+        this.role = AppRole.USER;
     }
 
 }

@@ -1,12 +1,17 @@
 package com.achiever.menschenfahren.controller.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.validation.Valid;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +27,18 @@ import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.base.exception.InvalidEventException;
 import com.achiever.menschenfahren.base.exception.InvalidEventTypeException;
 import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
+import com.achiever.menschenfahren.base.model.NotificationStatus;
+import com.achiever.menschenfahren.base.model.NotificationType;
 import com.achiever.menschenfahren.constants.Constants;
 import com.achiever.menschenfahren.dao.EventTypeDaoInterface;
+import com.achiever.menschenfahren.dao.FavoritesDaoInterface;
 import com.achiever.menschenfahren.dao.FilterEventDaoInterface;
+import com.achiever.menschenfahren.dao.NotificationDaoInterface;
 import com.achiever.menschenfahren.dao.UserDaoInterface;
 import com.achiever.menschenfahren.entities.events.Event;
 import com.achiever.menschenfahren.entities.events.EventType;
+import com.achiever.menschenfahren.entities.events.Favorites;
+import com.achiever.menschenfahren.entities.notification.Notification;
 import com.achiever.menschenfahren.entities.users.User;
 import com.achiever.menschenfahren.mapper.EventMapper;
 import com.achiever.menschenfahren.service.EventService;
@@ -46,21 +57,27 @@ import lombok.extern.slf4j.Slf4j;
 public class EventRestController extends BaseController implements EventRestControllerInterface {
 
     @Autowired
-    private EventService            eventService;
+    private EventService             eventService;
 
     @Autowired
-    private UserDaoInterface        userDao;
+    private UserDaoInterface         userDao;
 
     @Autowired
-    private EventTypeDaoInterface   eventTypeDao;
+    private FilterEventDaoInterface  filterEventDao;
 
     @Autowired
-    private FilterEventDaoInterface filterEventDao;
+    private AuthenticationService    authenticationService;
 
     @Autowired
-    private AuthenticationService   authenticationService;
+    private EventTypeDaoInterface    eventTypeDao;
 
-    private final EventMapper       eventMapper = new EventMapper();
+    @Autowired
+    private NotificationDaoInterface notificationDao;
+
+    @Autowired
+    private FavoritesDaoInterface    favoriteDao;
+
+    private final EventMapper        eventMapper = new EventMapper();
 
     /**
      * Get all events based on alsoVoided and alsoPrivate filter.
@@ -69,11 +86,17 @@ public class EventRestController extends BaseController implements EventRestCont
     public ResponseEntity<DataResponse<List<EventDto>>> getEvents(final boolean alsoVoided, final boolean alsoPrivate) {
         final List<Event> events = this.eventService.getEvents(alsoVoided, alsoPrivate);
 
+        List<Event> filteredEvents = events.stream().filter(event -> event.getEndDate().after(new Date())).collect(Collectors.toList());
+
+        String userId = authenticationService.getId();
         final List<EventDto> eventDtoList = new ArrayList<>();
-        for (final Event event : events) {
+        for (final Event event : filteredEvents) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             eventDto.setEventTypeId(event.getEventType().getId());
             eventDto.setUserId(event.getUser().getId());
+            if (StringUtils.isNotBlank(userId)) {
+                getFavoritesByUser(userId, eventDto);
+            }
             eventDtoList.add(eventDto);
         }
 
@@ -91,6 +114,7 @@ public class EventRestController extends BaseController implements EventRestCont
     @Override
     public ResponseEntity<DataResponse<EventDto>> getEvent(@Nonnull final String eventId, final boolean alsoVoided, final boolean alsoPrivate) {
         final Optional<Event> eventOptional = this.eventService.getEvent(eventId, alsoVoided, alsoPrivate);
+        String userId = authenticationService.getId();
         if (!eventOptional.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
@@ -99,6 +123,9 @@ public class EventRestController extends BaseController implements EventRestCont
             if (eventDto != null) {
                 eventDto.setUserId(event.getUser().getId());
                 eventDto.setEventTypeId(event.getEventType().getId());
+                if (StringUtils.isNotBlank(userId)) {
+                    getFavoritesByUser(userId, eventDto);
+                }
                 return buildResponse(eventDto, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.GONE);
@@ -158,11 +185,21 @@ public class EventRestController extends BaseController implements EventRestCont
         String userId = authenticationService.getId();
         final List<Event> events = this.eventService.getEventsByUserId(userId, alsoVoided);
 
+        // Finds the event Ids which was approved for your request or you have accepted the invite.
+        Set<String> eventIds = findApprovedInviteOrRequestEventIds(userId);
+
+        if (!CollectionUtils.isEmpty(eventIds)) {
+            List<Event> joinedEvent = this.eventService.getEventByIds(eventIds);
+
+            events.addAll(joinedEvent);
+        }
+
         final List<EventDto> myEvents = new ArrayList<>();
 
         for (final Event event : events) {
             final EventDto eventDto = this.eventMapper.map(event, EventDto.class);
             eventDto.setUserId(userId);
+            getFavoritesByUser(userId, eventDto);
             eventDto.setEventTypeId(event.getEventType().getId());
             myEvents.add(eventDto);
         }
@@ -180,6 +217,12 @@ public class EventRestController extends BaseController implements EventRestCont
     @Override
     public ResponseEntity<DataResponse<EventDto>> makeEventPrivate(@Nonnull final String eventId) throws ResourceNotFoundException {
 
+        String userId = authenticationService.getId();
+        final Optional<User> user = this.userDao.findById(userId);
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("User with Id:" + userId + " not found");
+        }
+
         final Event foundEvent = getEventById(eventId);
         foundEvent.setPrivate(true);
         final Event savedEvent = this.eventService.merge(foundEvent);
@@ -187,6 +230,7 @@ public class EventRestController extends BaseController implements EventRestCont
         // TODO: This is not the nice way to set the values. Need to find a better way to do this.
         response.setEventTypeId(savedEvent.getEventType().getId());
         response.setUserId(savedEvent.getUser().getId());
+        getFavoritesByUser(userId, response);
         return buildResponse(response, HttpStatus.OK);
 
     }
@@ -198,11 +242,18 @@ public class EventRestController extends BaseController implements EventRestCont
      */
     @Override
     public ResponseEntity<DataResponse<EventDto>> makeEventPublic(@Nonnull final String eventId) throws ResourceNotFoundException {
+        String userId = authenticationService.getId();
+        final Optional<User> user = this.userDao.findById(userId);
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("User with Id:" + userId + " not found");
+        }
+
         final Event event = getEventById(eventId);
 
         event.setPrivate(false);
         final Event savedEvent = this.eventService.merge(event);
         EventDto eventDto = eventMapper.map(savedEvent, EventDto.class);
+        getFavoritesByUser(userId, eventDto);
         eventDto.setUserId(savedEvent.getUser().getId());
         eventDto.setEventTypeId(savedEvent.getEventType().getId());
         return buildResponse(eventDto, HttpStatus.OK);
@@ -214,6 +265,11 @@ public class EventRestController extends BaseController implements EventRestCont
      */
     @Override
     public ResponseEntity<DataResponse<EventDto>> editEvent(@Nonnull final String eventId, @Valid final EventEditDto request) throws ResourceNotFoundException {
+        String userId = authenticationService.getId();
+        final Optional<User> user = this.userDao.findById(userId);
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("User with Id:" + userId + " not found");
+        }
         final Event event = getEventById(eventId);
         if (event == null) {
             throw new ResourceNotFoundException("The event not found with id: " + eventId);
@@ -227,6 +283,7 @@ public class EventRestController extends BaseController implements EventRestCont
 
         final Event savedEvent = eventService.createEvent(event);
         final EventDto response = eventMapper.map(savedEvent, EventDto.class);
+        getFavoritesByUser(userId, response);
         response.setUserId(savedEvent.getUser().getId());
         response.setEventTypeId(savedEvent.getEventType().getId());
         return buildResponse(response, HttpStatus.OK);
@@ -251,6 +308,9 @@ public class EventRestController extends BaseController implements EventRestCont
         return event;
     }
 
+    /**
+     * Filters event based on the filter request.
+     */
     @Override
     public ResponseEntity<DataResponse<List<EventDto>>> filterEvent(@Nonnull final @Valid FilterCreateDto request) {
 
@@ -277,4 +337,39 @@ public class EventRestController extends BaseController implements EventRestCont
 
     }
 
+    /**
+     * Set events which user has marked favorite.
+     *
+     * @param userId
+     *            The ID of user.
+     * @param eventDto
+     *            The Event dto.
+     */
+    private void getFavoritesByUser(@Nonnull final String userId, @Nonnull final EventDto eventDto) {
+        List<Favorites> favorites = this.favoriteDao.findByUserId(userId);
+        for (Favorites fav : favorites) {
+            if (fav.getEvent().getId().equals(eventDto.getId())) {
+                eventDto.setFavorite(true);
+            }
+        }
+    }
+
+    /**
+     * Finds list of notification of a user and filters only approved request or invite.
+     *
+     * @param userId
+     *            The ID of user.
+     * @return The list of approved event IDs.
+     */
+    @Nonnull
+    private Set<String> findApprovedInviteOrRequestEventIds(@Nonnull final String userId) {
+        // find REQUEST Event which is approved by the Event owner or . The userId in this case is the original sender -> REQUEST
+        List<Notification> notifications = this.notificationDao.findByOriginalSenderIdOrOriginalReceiverId(userId, userId);
+        List<Notification> filteredNotifications = notifications.stream().filter(notification -> (notification.getNotificationType() == NotificationType.INVITE
+                && notification.getNotificationStatus() == NotificationStatus.APPROVED)
+                || (notification.getNotificationType() == NotificationType.REQUEST && notification.getNotificationStatus() == NotificationStatus.APPROVED))
+                .collect(Collectors.toList());
+        Set<String> eventIds = filteredNotifications.stream().map(f -> f.getEvent().getId()).collect(Collectors.toSet());
+        return eventIds;
+    }
 }

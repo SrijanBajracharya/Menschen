@@ -60,7 +60,7 @@ public class FeedbackRestController extends BaseController implements FeedbackRe
         }
 
         Feedback feedback = this.feedbackMapper.map(request, Feedback.class);
-
+        feedback.setUserId(userId);
         Feedback savedFeedback = this.feedbackDao.save(feedback);
 
         return buildResponse(this.feedbackMapper.map(savedFeedback, FeedbackDto.class), HttpStatus.CREATED);

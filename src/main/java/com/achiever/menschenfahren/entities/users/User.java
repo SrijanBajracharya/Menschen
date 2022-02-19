@@ -21,6 +21,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
+import com.achiever.menschenfahren.base.model.AppRole;
 import com.achiever.menschenfahren.base.model.AuthProviderType;
 import com.achiever.menschenfahren.entities.model.AbstractBaseEntity;
 
@@ -62,6 +63,10 @@ public class User extends AbstractBaseEntity {
     @Nonnull
     private String           password;
 
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AppRole          role;
+
     @Column(name = "auth_provider")
     @Enumerated(EnumType.STRING)
     private AuthProviderType authenticationType;
@@ -93,6 +98,7 @@ public class User extends AbstractBaseEntity {
         this.modifiedTimestamp = createdTimestamp;
         this.isActive = true;
         this.voided = false;
+        this.role = AppRole.USER;
     }
 
 }

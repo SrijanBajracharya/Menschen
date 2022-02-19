@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.achiever.menschenfahren.base.model.NotificationStatus;
+import com.achiever.menschenfahren.base.model.NotificationType;
 import com.achiever.menschenfahren.entities.notification.Notification;
 
 /**
@@ -26,6 +28,13 @@ public interface NotificationDaoInterface extends JpaRepository<Notification, St
      * @return The list of notification.
      */
     List<Notification> findByOriginalSenderId(@Nonnull final String originalSenderId);
+
+    List<Notification> findByOriginalSenderIdAndNotificationType(@Nonnull final String originalSenderId, @Nonnull final NotificationType notificationType);
+
+    List<Notification> findByOriginalSenderIdAndNotificationTypeAndNotificationStatus(@Nonnull final String originalSenderId,
+            @Nonnull final NotificationType notificationType, @Nonnull final NotificationStatus notificationStatus);
+
+    List<Notification> findByOriginalSenderIdOrOriginalReceiverId(@Nonnull final String originalSenderId, @Nonnull final String originalReceiverId);
 
     /**
      * Finds all notification by original receiver id.

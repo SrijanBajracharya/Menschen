@@ -66,6 +66,7 @@ public class Event extends AbstractBaseEntity {
     private EventType          eventType;
 
     @Column(name = "description", length = 1000, nullable = false)
+    @Nonnull
     private String             description;
 
     @Column(name = "age_group")

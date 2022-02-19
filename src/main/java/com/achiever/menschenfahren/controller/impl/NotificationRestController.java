@@ -146,7 +146,7 @@ public class NotificationRestController extends BaseController implements Notifi
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<DataResponse<List<NotificationDto>>> ggetNotificationByToken(final boolean alsoVoided) throws InvalidNotificationException {
+    public ResponseEntity<DataResponse<List<NotificationDto>>> getNotificationByToken(final boolean alsoVoided) throws InvalidNotificationException {
         String userId = authenticationService.getId();
 
         List<Notification> receivedNotification = this.notificationService.findByOriginalReceiverId(userId, alsoVoided);
@@ -161,12 +161,31 @@ public class NotificationRestController extends BaseController implements Notifi
         if (CollectionUtils.isNotEmpty(allNotification)) {
             for (Notification notification : allNotification) {
                 NotificationDto convertedNotificationDto = this.notificationMapper.convertNotificationToNotificationDto(notification);
+                checkReceverSenderUser(convertedNotificationDto, userId);
                 allNotificationDto.add(convertedNotificationDto);
             }
 
             return buildResponse(allNotificationDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+    }
+
+    /**
+     * Setting if the senderId matches or receiver Id matches with logged in user.
+     *
+     * @param notification
+     *            The notification.e
+     * @param userId
+     *            The ID of user.
+     */
+    private void checkReceverSenderUser(@Nonnull final NotificationDto notification, @Nonnull final String userId) {
+
+        if (notification.getSenderUser().getId().equals(userId)) {
+            notification.setMatchedSenderUserId(true);
+        } else if (notification.getReceiverUser().getId().equals(userId)) {
+            notification.setMatchedReceiverUserId(true);
         }
 
     }
@@ -190,14 +209,11 @@ public class NotificationRestController extends BaseController implements Notifi
 
         User receiverUser = this.userDao.findByEmail(request.getReceiverEmailId());
 
-        System.err.println(receiverUser + "####receiverUser");
-
         if (receiverUser == null) {
             log.warn("The email address not found in our system." + request.getReceiverEmailId());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // Check if the invite has already been sent for the given user.
-
         Notification existedNotification = this.notificationService.findByOriginalSenderIdAndOriginalReceiverIdAndEventId(userId, receiverUser.getId(),
                 request.getEventId());
 

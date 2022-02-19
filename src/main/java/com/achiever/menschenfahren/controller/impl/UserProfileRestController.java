@@ -68,16 +68,22 @@ public class UserProfileRestController extends BaseController implements UserPro
     @Override
     public ResponseEntity<DataResponse<UserProfileDto>> createProfile(@Nonnull @Valid final UserProfileCreateDto request, final boolean alsoVoided)
             throws InvalidUserException {
+        System.err.println("I am here");
         String userId = authenticationService.getId();
+        System.err.println(userId);
+        System.err.println(request.toString());
         final Optional<User> user = this.userDao.findByIdAndVoided(userId, alsoVoided);
         if (user.isPresent()) {
             final User savedUser = user.get();
             request.setUserId(userId);
+            System.err.println("before map");
             final UserProfile userProfile = this.userProfileMapper.map(request, UserProfile.class);
             // setting user to userprofile.
             userProfile.setUser(savedUser);
+            System.err.println("after map" + userProfile);
 
             final UserProfile savedUserProfile = this.userProfileService.addProfile(userProfile, alsoVoided);
+            System.err.println(savedUserProfile);
             final UserProfileDto userProfileDto = this.userProfileMapper.map(savedUserProfile, UserProfileDto.class);
             if (userProfileDto != null) {
                 userProfileDto.setUserId(savedUser.getId());
@@ -98,7 +104,7 @@ public class UserProfileRestController extends BaseController implements UserPro
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws MultipleResourceFoundException
      */
     @Override
@@ -138,7 +144,7 @@ public class UserProfileRestController extends BaseController implements UserPro
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws MultipleResourceFoundException
      */
     @Override

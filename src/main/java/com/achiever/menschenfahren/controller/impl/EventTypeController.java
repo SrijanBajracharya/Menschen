@@ -21,8 +21,8 @@ import com.achiever.menschenfahren.entities.events.EventType;
 import com.achiever.menschenfahren.mapper.EventTypeMapper;
 import com.achiever.menschenfahren.service.EventTypeService;
 
-/**
- *
+/****
+ * 
  * @author Srijan Bajracharya
  *
  */

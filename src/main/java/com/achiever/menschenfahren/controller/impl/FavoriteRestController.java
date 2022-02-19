@@ -18,6 +18,7 @@ import com.achiever.menschenfahren.base.controller.FavoritesRestControllerInterf
 import com.achiever.menschenfahren.base.dto.request.FavoriteCreateDto;
 import com.achiever.menschenfahren.base.dto.response.AllFavoritesResponse;
 import com.achiever.menschenfahren.base.dto.response.DataResponse;
+import com.achiever.menschenfahren.base.dto.response.EventDto;
 import com.achiever.menschenfahren.base.dto.response.FavoritesDto;
 import com.achiever.menschenfahren.base.exception.InvalidFavoriteException;
 import com.achiever.menschenfahren.base.exception.ResourceNotFoundException;
@@ -135,7 +136,8 @@ public class FavoriteRestController extends BaseController implements FavoritesR
         for (Favorites favorite : favorites) {
             AllFavoritesResponse favoriteResponseDto = this.favoritesMapper.map(favorite, AllFavoritesResponse.class);
             favoriteResponseDto.getEvent().setUserId(userId);
-            favoriteResponseDto.getEvent().setEventTypeId(favorite.getEvent().getEventType().getId());
+            getFavoritesByUser(userId, favoriteResponseDto.getEvent());
+            // favoriteResponseDto.getEvent().setEventTypeId(favorite.getEvent().getEventType().getId());
             allFavorites.add(favoriteResponseDto);
 
         }
@@ -175,6 +177,15 @@ public class FavoriteRestController extends BaseController implements FavoritesR
                 return getAllFavoriteDto(userId);
             }
 
+        }
+    }
+
+    private void getFavoritesByUser(@Nonnull final String userId, @Nonnull final EventDto eventDto) {
+        List<Favorites> favorites = this.favoriteDao.findByUserId(userId);
+        for (Favorites fav : favorites) {
+            if (fav.getEvent().getId().equals(eventDto.getId())) {
+                eventDto.setFavorite(true);
+            }
         }
     }
 

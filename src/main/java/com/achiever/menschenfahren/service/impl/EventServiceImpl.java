@@ -1,7 +1,9 @@
 package com.achiever.menschenfahren.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -27,12 +29,10 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public List<Event> getEvents(final boolean alsoVoided, final boolean alsoPrivate) {
-        List<Event> events;
+        List<Event> events = new ArrayList<>();
 
         if (alsoPrivate && alsoVoided) {
             events = eventDao.findAll();
-        } else if (!alsoVoided && alsoPrivate) {
-            events = eventDao.findByVoided(alsoVoided);
         } else {
             events = eventDao.findByVoidedAndIsPrivate(alsoVoided, alsoPrivate);
         }
@@ -87,6 +87,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event merge(@Nonnull final Event event) {
         return this.eventDao.save(event);
+    }
+
+    @Nonnull
+    @Override
+    public List<Event> getEventByIds(@Nonnull final Set<String> ids) {
+        return this.eventDao.findAllByIdIn(ids);
     }
 
 }

@@ -131,14 +131,15 @@ public class UserRestController extends BaseController implements UserRestContro
     }
 
     private User addUser(@NonNull final User user) throws InvalidUserException {
-        final User userExists = userDao.findByEmail(user.getEmail());
-        User savedUser = null;
-        if (userExists == null) {
-            savedUser = userDao.save(user);
+        final boolean userExists = userDao.existsByEmail(user.getEmail());
+        final boolean usernameExists = userDao.existsByUsername(user.getUsername());
+        if (!userExists && !usernameExists) {
+            final User savedUser = userDao.save(user);
+            return savedUser;
         } else {
             throw new InvalidUserException("Email and/or username must be unique.");
         }
-        return savedUser;
+
     }
 
     private List<User> getUsersBasedOnAlsoVoided(final boolean alsoVoided) {
